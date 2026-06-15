@@ -2,6 +2,7 @@
 import { Command } from 'commander';
 import pc from 'picocolors';
 import { select, input } from '@inquirer/prompts';
+import pkg from '../package.json';
 import { createCommand } from './commands/create';
 import {
   generateModuleCommand,
@@ -21,7 +22,7 @@ const program = new Command();
 program
   .name('nest-scaffold')
   .description('Scaffold NestJS modular backend projects')
-  .version('0.2.0');
+  .version(pkg.version);
 
 program
   .command('create')
