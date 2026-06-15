@@ -1,0 +1,22 @@
+import { Logger } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { AppModule } from '../app.module';
+import { seedUsers } from './seeds/users.seed';
+
+const logger = new Logger('Seed');
+
+async function bootstrap(): Promise<void> {
+  const app = await NestFactory.createApplicationContext(AppModule);
+
+  try {
+    await seedUsers(app);
+    logger.log('Seed completed');
+  } catch (error) {
+    logger.error('Seed failed', error);
+    process.exitCode = 1;
+  } finally {
+    await app.close();
+  }
+}
+
+void bootstrap();

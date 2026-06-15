@@ -1,0 +1,20 @@
+import { HttpStatus } from '@nestjs/common';
+import { ErrorDescriptor } from '../../common/errors/app-error-catalog';
+
+export enum AuthErrorCode {
+  EmailAlreadyInUse = 'EMAIL_ALREADY_IN_USE',
+  InvalidCredentials = 'INVALID_CREDENTIALS',
+}
+
+export const AUTH_ERRORS = {
+  EMAIL_ALREADY_IN_USE: {
+    code: AuthErrorCode.EmailAlreadyInUse,
+    message: 'Email already in use',
+    statusCode: HttpStatus.CONFLICT,
+  },
+  INVALID_CREDENTIALS: {
+    code: AuthErrorCode.InvalidCredentials,
+    message: 'Invalid credentials',
+    statusCode: HttpStatus.UNAUTHORIZED,
+  },
+} as const satisfies Record<string, ErrorDescriptor>;

@@ -1,0 +1,79 @@
+import { applyDecorators } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiConflictError,
+  ApiDefaultErrors,
+  ApiNotFoundError,
+  ApiProtectedErrors,
+} from '../../../common/swagger/decorators/api-error-responses.decorator';
+import {
+  ApiEmptySuccessResponse,
+  ApiPaginatedSuccessResponse,
+  ApiSuccessResponse,
+} from '../../../common/swagger/decorators/api-success-response.decorator';
+import { USER_ERRORS } from '../user-error-catalog';
+import { UserResponseDto } from './user-response.dto';
+
+export function ApiCreateUserDocs() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Create a user' }),
+    ApiSuccessResponse(UserResponseDto, 'User created'),
+    ApiConflictError(
+      USER_ERRORS.USER_EMAIL_ALREADY_IN_USE.code,
+      USER_ERRORS.USER_EMAIL_ALREADY_IN_USE.message,
+    ),
+    ApiDefaultErrors(),
+  );
+}
+
+export function ApiFindUsersDocs() {
+  return applyDecorators(
+    ApiBearerAuth(),
+    ApiOperation({ summary: 'Search users with pagination' }),
+    ApiPaginatedSuccessResponse(UserResponseDto, 'Users found'),
+    ApiProtectedErrors(),
+    ApiDefaultErrors(),
+  );
+}
+
+export function ApiFindUserByIdDocs() {
+  return applyDecorators(
+    ApiBearerAuth(),
+    ApiOperation({ summary: 'Get user by ID' }),
+    ApiSuccessResponse(UserResponseDto, 'User found'),
+    ApiNotFoundError(
+      USER_ERRORS.USER_NOT_FOUND.code,
+      USER_ERRORS.USER_NOT_FOUND.message,
+    ),
+    ApiProtectedErrors(),
+    ApiDefaultErrors(),
+  );
+}
+
+export function ApiUpdateUserDocs() {
+  return applyDecorators(
+    ApiBearerAuth(),
+    ApiOperation({ summary: 'Update user' }),
+    ApiSuccessResponse(UserResponseDto, 'User updated'),
+    ApiNotFoundError(
+      USER_ERRORS.USER_NOT_FOUND.code,
+      USER_ERRORS.USER_NOT_FOUND.message,
+    ),
+    ApiProtectedErrors(),
+    ApiDefaultErrors(),
+  );
+}
+
+export function ApiDeleteUserDocs() {
+  return applyDecorators(
+    ApiBearerAuth(),
+    ApiOperation({ summary: 'Delete user' }),
+    ApiEmptySuccessResponse('User deleted'),
+    ApiNotFoundError(
+      USER_ERRORS.USER_NOT_FOUND.code,
+      USER_ERRORS.USER_NOT_FOUND.message,
+    ),
+    ApiProtectedErrors(),
+    ApiDefaultErrors(),
+  );
+}

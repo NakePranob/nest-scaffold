@@ -1,0 +1,14 @@
+import { IsString, MinLength, IsOptional } from 'class-validator';
+{{#if hasSwagger}}
+import { ApiPropertyOptional } from '@nestjs/swagger';
+{{/if}}
+
+export class Update{{entityName}}Dto {
+{{#if hasSwagger}}
+  @ApiPropertyOptional({ example: 'Updated name' })
+{{/if}}
+  @IsOptional()
+  @IsString()
+  @MinLength(1)
+  name?: string;
+}

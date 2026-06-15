@@ -1,0 +1,14 @@
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { NestFastifyApplication } from '@nestjs/platform-fastify';
+
+export function setupSwagger(app: NestFastifyApplication) {
+  const config = new DocumentBuilder()
+    .setTitle('{{projectName}}')
+    .setDescription('API documentation')
+    .setVersion('1.0')
+    .addBearerAuth()
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
+}

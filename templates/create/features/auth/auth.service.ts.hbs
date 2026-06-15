@@ -1,0 +1,57 @@
+import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { isUniqueConstraintError } from '../../common/helpers/database-error';
+import { AppException } from '../../common/helpers/app-exception';
+import { hashPassword } from '../../common/helpers/hash-password';
+import { User } from '../users/entities/user.entity';
+import { AUTH_ERRORS } from './auth-error-catalog';
+import { RegisterDto } from './dto/register.dto';
+import { LoginDto } from './dto/login.dto';
+
+@Injectable()
+export class AuthService {
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepo: Repository<User>,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  async register(dto: RegisterDto) {
+    const existing = await this.userRepo.findOneBy({ email: dto.email });
+    if (existing) {
+      throw AppException.from(AUTH_ERRORS.EMAIL_ALREADY_IN_USE);
+    }
+
+    const user = this.userRepo.create({
+      email: dto.email,
+      password: hashPassword(dto.password),
+      name: dto.name,
+    });
+    try {
+      await this.userRepo.save(user);
+    } catch (error) {
+      if (isUniqueConstraintError(error)) {
+        throw AppException.from(AUTH_ERRORS.EMAIL_ALREADY_IN_USE);
+      }
+
+      throw error;
+    }
+
+    return this.generateToken(user);
+  }
+
+  async login(dto: LoginDto) {
+    const user = await this.userRepo.findOneBy({ email: dto.email });
+    if (!user || user.password !== hashPassword(dto.password)) {
+      throw AppException.from(AUTH_ERRORS.INVALID_CREDENTIALS);
+    }
+    return this.generateToken(user);
+  }
+
+  private generateToken(user: User) {
+    const payload = { sub: user.id, email: user.email };
+    return { accessToken: this.jwtService.sign(payload) };
+  }
+}

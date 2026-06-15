@@ -1,0 +1,45 @@
+import { JwtService } from '@nestjs/jwt';
+import { Repository } from 'typeorm';
+import { AUTH_ERRORS } from './auth-error-catalog';
+import { AuthService } from './auth.service';
+import { User } from '../users/entities/user.entity';
+
+describe('AuthService', () => {
+  let service: AuthService;
+  let userRepo: Partial<Repository<User>>;
+
+  beforeEach(() => {
+    userRepo = {
+      findOneBy: jest.fn().mockResolvedValue(null),
+      create: jest.fn().mockImplementation((dto) => dto),
+      save: jest.fn().mockRejectedValue({
+        driverError: {
+          code: '23505',
+        },
+      }),
+    };
+
+    service = new AuthService(
+      userRepo as Repository<User>,
+      {
+        sign: jest.fn(),
+      } as unknown as JwtService,
+    );
+  });
+
+  it('maps unique email race conditions to auth module conflict error', async () => {
+    await expect(
+      service.register({
+        email: 'user@example.com',
+        password: 'password123',
+      }),
+    ).rejects.toMatchObject({
+      response: {
+        code: AUTH_ERRORS.EMAIL_ALREADY_IN_USE.code,
+        message: AUTH_ERRORS.EMAIL_ALREADY_IN_USE.message,
+        errors: undefined,
+      },
+      status: AUTH_ERRORS.EMAIL_ALREADY_IN_USE.statusCode,
+    });
+  });
+});

@@ -1,0 +1,20 @@
+import { HttpStatus } from '@nestjs/common';
+import { ErrorDescriptor } from '../../common/errors/app-error-catalog';
+
+export enum {{pascalName}}ErrorCode {
+  NotFound = '{{errorPrefix}}_NOT_FOUND',
+  AlreadyExists = '{{errorPrefix}}_ALREADY_EXISTS',
+}
+
+export const {{errorPrefix}}_ERRORS = {
+  {{errorPrefix}}_NOT_FOUND: {
+    code: {{pascalName}}ErrorCode.NotFound,
+    message: '{{entityName}} not found',
+    statusCode: HttpStatus.NOT_FOUND,
+  },
+  {{errorPrefix}}_ALREADY_EXISTS: {
+    code: {{pascalName}}ErrorCode.AlreadyExists,
+    message: '{{entityName}} already exists',
+    statusCode: HttpStatus.CONFLICT,
+  },
+} as const satisfies Record<string, ErrorDescriptor>;

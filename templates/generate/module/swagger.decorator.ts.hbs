@@ -1,0 +1,79 @@
+import { applyDecorators } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiConflictError,
+  ApiDefaultErrors,
+  ApiNotFoundError,
+  ApiProtectedErrors,
+} from '../../../common/swagger/decorators/api-error-responses.decorator';
+import {
+  ApiEmptySuccessResponse,
+  ApiPaginatedSuccessResponse,
+  ApiSuccessResponse,
+} from '../../../common/swagger/decorators/api-success-response.decorator';
+import { {{errorPrefix}}_ERRORS } from '../{{entityFile}}-error-catalog';
+import { {{entityName}}ResponseDto } from './{{entityFile}}-response.dto';
+
+export function ApiCreate{{entityName}}Docs() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Create {{entityFile}}' }),
+    ApiSuccessResponse({{entityName}}ResponseDto, '{{entityName}} created'),
+    ApiConflictError(
+      {{errorPrefix}}_ERRORS.{{errorPrefix}}_ALREADY_EXISTS.code,
+      {{errorPrefix}}_ERRORS.{{errorPrefix}}_ALREADY_EXISTS.message,
+    ),
+    ApiDefaultErrors(),
+  );
+}
+
+export function ApiFind{{pascalName}}Docs() {
+  return applyDecorators(
+    ApiBearerAuth(),
+    ApiOperation({ summary: 'Search {{name}} with pagination' }),
+    ApiPaginatedSuccessResponse({{entityName}}ResponseDto, '{{pascalName}} found'),
+    ApiProtectedErrors(),
+    ApiDefaultErrors(),
+  );
+}
+
+export function ApiFind{{entityName}}ByIdDocs() {
+  return applyDecorators(
+    ApiBearerAuth(),
+    ApiOperation({ summary: 'Get {{entityFile}} by ID' }),
+    ApiSuccessResponse({{entityName}}ResponseDto, '{{entityName}} found'),
+    ApiNotFoundError(
+      {{errorPrefix}}_ERRORS.{{errorPrefix}}_NOT_FOUND.code,
+      {{errorPrefix}}_ERRORS.{{errorPrefix}}_NOT_FOUND.message,
+    ),
+    ApiProtectedErrors(),
+    ApiDefaultErrors(),
+  );
+}
+
+export function ApiUpdate{{entityName}}Docs() {
+  return applyDecorators(
+    ApiBearerAuth(),
+    ApiOperation({ summary: 'Update {{entityFile}}' }),
+    ApiSuccessResponse({{entityName}}ResponseDto, '{{entityName}} updated'),
+    ApiNotFoundError(
+      {{errorPrefix}}_ERRORS.{{errorPrefix}}_NOT_FOUND.code,
+      {{errorPrefix}}_ERRORS.{{errorPrefix}}_NOT_FOUND.message,
+    ),
+    ApiProtectedErrors(),
+    ApiDefaultErrors(),
+  );
+}
+
+export function ApiDelete{{entityName}}Docs() {
+  return applyDecorators(
+    ApiBearerAuth(),
+    ApiOperation({ summary: 'Delete {{entityFile}}' }),
+    ApiEmptySuccessResponse('{{entityName}} deleted'),
+    ApiNotFoundError(
+      {{errorPrefix}}_ERRORS.{{errorPrefix}}_NOT_FOUND.code,
+      {{errorPrefix}}_ERRORS.{{errorPrefix}}_NOT_FOUND.message,
+    ),
+    ApiProtectedErrors(),
+    ApiDefaultErrors(),
+  );
+}

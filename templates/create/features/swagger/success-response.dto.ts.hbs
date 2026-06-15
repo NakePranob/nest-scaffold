@@ -1,0 +1,32 @@
+import { ApiProperty } from '@nestjs/swagger';
+
+export class SuccessResponseDto<TData = unknown> {
+  @ApiProperty({ example: 'SUCCESS' })
+  code: string;
+
+  @ApiProperty({ example: 'success' })
+  message: string;
+
+  data: TData;
+}
+
+export class PaginationMetaDto {
+  @ApiProperty({ example: 1 })
+  page: number;
+
+  @ApiProperty({ example: 10 })
+  limit: number;
+
+  @ApiProperty({ example: 47 })
+  total: number;
+
+  @ApiProperty({ example: 5 })
+  totalPages: number;
+}
+
+export class PaginatedSuccessResponseDto<
+  TData = unknown,
+> extends SuccessResponseDto<TData[]> {
+  @ApiProperty({ type: PaginationMetaDto })
+  meta: PaginationMetaDto;
+}

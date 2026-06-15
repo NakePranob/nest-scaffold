@@ -1,0 +1,20 @@
+import { HttpStatus } from '@nestjs/common';
+import { ErrorDescriptor } from '../../common/errors/app-error-catalog';
+
+export enum UserErrorCode {
+  UserNotFound = 'USER_NOT_FOUND',
+  UserEmailAlreadyInUse = 'USER_EMAIL_ALREADY_IN_USE',
+}
+
+export const USER_ERRORS = {
+  USER_NOT_FOUND: {
+    code: UserErrorCode.UserNotFound,
+    message: 'User not found',
+    statusCode: HttpStatus.NOT_FOUND,
+  },
+  USER_EMAIL_ALREADY_IN_USE: {
+    code: UserErrorCode.UserEmailAlreadyInUse,
+    message: 'User email already in use',
+    statusCode: HttpStatus.CONFLICT,
+  },
+} as const satisfies Record<string, ErrorDescriptor>;

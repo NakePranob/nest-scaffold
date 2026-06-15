@@ -1,0 +1,42 @@
+{
+  "name": "@nakedev/nest-scaffold",
+  "version": "0.1.0",
+  "description": "Scaffold NestJS modular backend projects with selectable features",
+  "bin": {
+    "nest-scaffold": "./bin/nest-scaffold.js"
+  },
+  "files": [
+    "dist",
+    "templates",
+    "bin"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "prepublishOnly": "pnpm run build"
+  },
+  "keywords": [
+    "nestjs",
+    "scaffold",
+    "cli",
+    "generator"
+  ],
+  "author": "nakedev",
+  "license": "MIT",
+  "dependencies": {
+    "@inquirer/prompts": "^7.5.1",
+    "commander": "^13.1.0",
+    "fs-extra": "^11.3.0",
+    "handlebars": "^4.7.8",
+    "picocolors": "^1.1.1",
+    "ts-morph": "^25.0.1"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^24.0.0",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

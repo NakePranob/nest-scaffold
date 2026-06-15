@@ -1,0 +1,51 @@
+import { INestApplicationContext, Logger } from '@nestjs/common';
+import { getRepositoryToken } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { hashPassword } from '../../common/helpers/hash-password';
+import { User } from '../../modules/users/entities/user.entity';
+
+const logger = new Logger('UsersSeed');
+
+const SEED_USERS: Array<{
+  email: string;
+  password: string;
+  name: string;
+  role: string;
+}> = [
+  {
+    email: 'admin@example.com',
+    password: 'password123',
+    name: 'Admin',
+    role: 'admin',
+  },
+  {
+    email: 'user@example.com',
+    password: 'password123',
+    name: 'Demo User',
+    role: 'user',
+  },
+];
+
+export async function seedUsers(app: INestApplicationContext): Promise<void> {
+  const repo = app.get<Repository<User>>(getRepositoryToken(User));
+
+  for (const data of SEED_USERS) {
+    const existing = await repo.findOneBy({ email: data.email });
+    if (existing) {
+      logger.log(`Skip ${data.email} (already exists)`);
+      continue;
+    }
+
+    await repo.save(
+      repo.create({
+        email: data.email,
+        password: hashPassword(data.password),
+        name: data.name,
+        role: data.role,
+        isActive: true,
+      }),
+    );
+
+    logger.log(`Created ${data.email}`);
+  }
+}

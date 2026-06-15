@@ -1,0 +1,36 @@
+import {
+  Injectable,
+  NestInterceptor,
+  ExecutionContext,
+  CallHandler,
+} from '@nestjs/common';
+import { Observable, map } from 'rxjs';
+
+interface WrappedData {
+  data: unknown;
+  meta: unknown;
+}
+
+@Injectable()
+export class ResponseInterceptor implements NestInterceptor {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
+    return next.handle().pipe(
+      map((value: unknown) => {
+        const wrapped = value as WrappedData | null;
+        if (wrapped && typeof wrapped === 'object' && 'meta' in wrapped) {
+          return {
+            code: 'SUCCESS',
+            message: 'success',
+            data: wrapped.data,
+            meta: wrapped.meta,
+          };
+        }
+        return {
+          code: 'SUCCESS',
+          message: 'success',
+          data: value,
+        };
+      }),
+    );
+  }
+}

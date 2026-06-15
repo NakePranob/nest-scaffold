@@ -1,0 +1,59 @@
+import {
+  Catch,
+  ExceptionFilter,
+  ArgumentsHost,
+  HttpException,
+} from '@nestjs/common';
+import { FastifyReply } from 'fastify';
+import {
+  COMMON_ERRORS,
+  getHttpErrorDescriptor,
+} from '../errors/app-error-catalog';
+
+function serializeError(exception: unknown) {
+  if (exception instanceof Error) {
+    return {
+      name: exception.name,
+      message: exception.message,
+      stack: exception.stack,
+    };
+  }
+
+  return {
+    message: String(exception),
+  };
+}
+
+@Catch()
+export class AllExceptionsFilter implements ExceptionFilter {
+  catch(exception: unknown, host: ArgumentsHost) {
+    const ctx = host.switchToHttp();
+    const response = ctx.getResponse<FastifyReply>();
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    let status = COMMON_ERRORS.INTERNAL_ERROR.statusCode;
+    const body: Record<string, unknown> = {
+      code: COMMON_ERRORS.INTERNAL_ERROR.code,
+      message: COMMON_ERRORS.INTERNAL_ERROR.message,
+      errors: isProduction ? null : serializeError(exception),
+    };
+
+    if (exception instanceof HttpException) {
+      status = exception.getStatus();
+      const descriptor = getHttpErrorDescriptor(status);
+      body.errors = null;
+      const res = exception.getResponse();
+      if (typeof res === 'string') {
+        body.code = descriptor.code;
+        body.message = res;
+      } else if (typeof res === 'object') {
+        const r = res as Record<string, unknown>;
+        body.code = r.code ?? descriptor.code;
+        body.message = r.message ?? descriptor.message;
+        if (r.errors) body.errors = r.errors;
+      }
+    }
+
+    response.status(status).send(body);
+  }
+}

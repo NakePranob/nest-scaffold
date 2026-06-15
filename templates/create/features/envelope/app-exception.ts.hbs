@@ -1,0 +1,25 @@
+import { HttpException } from '@nestjs/common';
+import { ErrorDescriptor } from '../errors/app-error-catalog';
+
+export class AppException extends HttpException {
+  private constructor(
+    code: string,
+    message: string,
+    statusCode: number = 400,
+    errors?: { field: string; message: string }[],
+  ) {
+    super({ code, message, errors }, statusCode);
+  }
+
+  static from(
+    descriptor: ErrorDescriptor,
+    errors?: { field: string; message: string }[],
+  ) {
+    return new AppException(
+      descriptor.code,
+      descriptor.message,
+      descriptor.statusCode,
+      errors,
+    );
+  }
+}

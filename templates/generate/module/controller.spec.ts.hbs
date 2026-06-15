@@ -1,0 +1,31 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { {{pascalName}}Controller } from './{{fileBase}}.controller';
+import { {{pascalName}}Service } from './{{fileBase}}.service';
+
+describe('{{pascalName}}Controller', () => {
+  let controller: {{pascalName}}Controller;
+
+  beforeEach(async () => {
+    const module: TestingModule = await Test.createTestingModule({
+      controllers: [{{pascalName}}Controller],
+      providers: [
+        {
+          provide: {{pascalName}}Service,
+          useValue: {
+            create: jest.fn(),
+            findAll: jest.fn(),
+            findById: jest.fn(),
+            update: jest.fn(),
+            delete: jest.fn(),
+          },
+        },
+      ],
+    }).compile();
+
+    controller = module.get<{{pascalName}}Controller>({{pascalName}}Controller);
+  });
+
+  it('should be defined', () => {
+    expect(controller).toBeDefined();
+  });
+});

@@ -1,0 +1,81 @@
+import path from 'node:path';
+import fs from 'fs-extra';
+import pc from 'picocolors';
+import { promptProjectName, runCreateWizard } from '../prompts/create-wizard';
+import { enforceDependencies, writeConfig } from '../utils/config';
+import { ScaffoldConfig } from '../types';
+import {
+  applyTemplateEntries,
+  buildTemplateContext,
+} from '../utils/template-renderer';
+import { getCreateTemplateEntries } from '../templates/manifest';
+
+export async function createCommand(
+  projectNameArg?: string,
+  options?: { directory?: string; defaults?: boolean },
+): Promise<void> {
+  const projectName = projectNameArg
+    ? projectNameArg.trim()
+    : await promptProjectName();
+
+  const config = options?.defaults
+    ? getDefaultConfig(projectName)
+    : await runCreateWizard(projectName);
+  const targetDir = path.resolve(
+    options?.directory ?? process.cwd(),
+    projectName,
+  );
+
+  if (await fs.pathExists(targetDir)) {
+    const files = await fs.readdir(targetDir);
+    if (files.length > 0) {
+      throw new Error(
+        `Directory "${targetDir}" already exists and is not empty`,
+      );
+    }
+  }
+
+  await fs.ensureDir(targetDir);
+
+  const context = buildTemplateContext(config);
+  const entries = getCreateTemplateEntries();
+
+  console.log(pc.cyan(`\nCreating project in ${targetDir}...\n`));
+
+  await applyTemplateEntries(targetDir, entries, context);
+  await writeConfig(targetDir, config);
+
+  console.log(pc.green('\n✓ Project created successfully!\n'));
+  console.log('Next steps:');
+  console.log(`  cd ${projectName}`);
+  if (config.docker) {
+    console.log('  docker compose up -d');
+  }
+  console.log('  cp .env.example .env');
+  console.log('  pnpm install');
+  console.log('  pnpm run start:dev');
+  if (config.swagger) {
+    console.log('\n  Swagger: http://localhost:3000/api');
+  }
+  console.log('');
+}
+
+function getDefaultConfig(projectName: string): ScaffoldConfig {
+  return enforceDependencies({
+    version: 1,
+    projectName,
+    swagger: true,
+    docker: true,
+    typeorm: true,
+    responseEnvelope: true,
+    pagination: true,
+    auth: true,
+    usersModule: true,
+    seeds: false,
+    e2e: false,
+    docs: true,
+    httpAdapter: 'fastify',
+    orm: 'typeorm',
+    database: 'postgres',
+  });
+}

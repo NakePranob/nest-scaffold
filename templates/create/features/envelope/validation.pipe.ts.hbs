@@ -1,0 +1,60 @@
+import {
+  BadRequestException,
+  ValidationPipe,
+  ValidationPipeOptions,
+} from '@nestjs/common';
+import { ValidationError } from 'class-validator';
+import { COMMON_ERRORS } from '../errors/app-error-catalog';
+
+type ValidationErrorItem = {
+  field: string;
+  message: string;
+};
+
+function flattenValidationErrors(
+  errors: ValidationError[],
+  parentPath?: string,
+): ValidationErrorItem[] {
+  return errors.flatMap((error) => {
+    const field = parentPath
+      ? `${parentPath}.${error.property}`
+      : error.property;
+    const messages = Object.values(error.constraints ?? {}).map((message) => ({
+      field,
+      message,
+    }));
+
+    if (error.children?.length) {
+      return [...messages, ...flattenValidationErrors(error.children, field)];
+    }
+
+    return messages;
+  });
+}
+
+export function createValidationException(
+  errors: ValidationError[],
+  hideDetails = false,
+) {
+  return new BadRequestException({
+    code: COMMON_ERRORS.VALIDATION_ERROR.code,
+    message: COMMON_ERRORS.VALIDATION_ERROR.message,
+    errors: hideDetails ? null : flattenValidationErrors(errors),
+  });
+}
+
+export class AppValidationPipe extends ValidationPipe {
+  constructor(options: ValidationPipeOptions = {}) {
+    const hideErrorDetails = options.disableErrorMessages === true;
+
+    super({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      ...options,
+      exceptionFactory:
+        options.exceptionFactory ??
+        ((errors) => createValidationException(errors, hideErrorDetails)),
+    });
+  }
+}

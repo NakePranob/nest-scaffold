@@ -1,0 +1,14 @@
+import { IsOptional, IsString } from 'class-validator';
+import { PaginationDto } from '../../../common/dto/pagination.dto';
+{{#if hasSwagger}}
+import { ApiPropertyOptional } from '@nestjs/swagger';
+{{/if}}
+
+export class Search{{entityName}}Dto extends PaginationDto {
+{{#if hasSwagger}}
+  @ApiPropertyOptional({ example: 'search term' })
+{{/if}}
+  @IsOptional()
+  @IsString()
+  search?: string;
+}

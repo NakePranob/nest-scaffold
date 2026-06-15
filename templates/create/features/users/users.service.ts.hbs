@@ -1,0 +1,63 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { SearchUserDto } from './dto/search-user.dto';
+import { UserFilterQuery } from './queries/user-filter.query';
+import { PaginatedResult } from '../../common/interfaces/paginated-result.interface';
+import { AppException } from '../../common/helpers/app-exception';
+import { isUniqueConstraintError } from '../../common/helpers/database-error';
+import { USER_ERRORS } from './user-error-catalog';
+
+@Injectable()
+export class UsersService {
+  constructor(
+    @InjectRepository(User)
+    private readonly repo: Repository<User>,
+  ) {}
+
+  async create(dto: CreateUserDto): Promise<User> {
+    const user = this.repo.create(dto);
+    try {
+      return await this.repo.save(user);
+    } catch (error) {
+      if (isUniqueConstraintError(error)) {
+        throw AppException.from(USER_ERRORS.USER_EMAIL_ALREADY_IN_USE);
+      }
+
+      throw error;
+    }
+  }
+
+  async findAll(dto: SearchUserDto): Promise<PaginatedResult<User>> {
+    const qb = this.repo.createQueryBuilder('user');
+    const page = dto.page!;
+    const limit = dto.limit!;
+    return new UserFilterQuery(qb)
+      .bySearch(dto.search)
+      .byRole(dto.role)
+      .byActive(dto.isActive)
+      .withPagination(page, limit)
+      .withDefaultOrder()
+      .execPaginated(page, limit);
+  }
+
+  async findById(id: string): Promise<User> {
+    const user = await this.repo.findOneBy({ id });
+    if (!user) throw AppException.from(USER_ERRORS.USER_NOT_FOUND);
+    return user;
+  }
+
+  async update(id: string, dto: UpdateUserDto): Promise<User> {
+    await this.repo.update(id, dto);
+    return this.findById(id);
+  }
+
+  async delete(id: string): Promise<void> {
+    const result = await this.repo.delete(id);
+    if (result.affected === 0)
+      throw AppException.from(USER_ERRORS.USER_NOT_FOUND);
+  }
+}

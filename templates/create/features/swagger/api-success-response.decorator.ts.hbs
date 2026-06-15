@@ -1,0 +1,88 @@
+import { Type, applyDecorators } from '@nestjs/common';
+import { ApiExtraModels, ApiOkResponse, getSchemaPath } from '@nestjs/swagger';
+import {
+  PaginatedSuccessResponseDto,
+  SuccessResponseDto,
+} from '../dto/success-response.dto';
+
+export function ApiSuccessResponse<TModel extends Type<unknown>>(
+  model: TModel,
+  description = 'Success',
+) {
+  return applyDecorators(
+    ApiExtraModels(SuccessResponseDto, model),
+    ApiOkResponse({
+      description,
+      schema: {
+        allOf: [
+          { $ref: getSchemaPath(SuccessResponseDto) },
+          {
+            properties: {
+              data: { $ref: getSchemaPath(model) },
+            },
+          },
+        ],
+      },
+    }),
+  );
+}
+
+export function ApiEmptySuccessResponse(description = 'Success') {
+  return applyDecorators(
+    ApiExtraModels(SuccessResponseDto),
+    ApiOkResponse({
+      description,
+      schema: { $ref: getSchemaPath(SuccessResponseDto) },
+    }),
+  );
+}
+
+export function ApiArraySuccessResponse<TModel extends Type<unknown>>(
+  model: TModel,
+  description = 'Success',
+) {
+  return applyDecorators(
+    ApiExtraModels(SuccessResponseDto, model),
+    ApiOkResponse({
+      description,
+      schema: {
+        allOf: [
+          { $ref: getSchemaPath(SuccessResponseDto) },
+          {
+            properties: {
+              data: {
+                type: 'array',
+                items: { $ref: getSchemaPath(model) },
+              },
+            },
+          },
+        ],
+      },
+    }),
+  );
+}
+
+export function ApiPaginatedSuccessResponse<TModel extends Type<unknown>>(
+  model: TModel,
+  description = 'Success',
+) {
+  return applyDecorators(
+    ApiExtraModels(PaginatedSuccessResponseDto, model),
+    ApiOkResponse({
+      description,
+      schema: {
+        allOf: [
+          { $ref: getSchemaPath(PaginatedSuccessResponseDto) },
+          {
+            properties: {
+              data: {
+                type: 'array',
+                items: { $ref: getSchemaPath(model) },
+              },
+            },
+          },
+        ],
+      },
+    }),
+  );
+}

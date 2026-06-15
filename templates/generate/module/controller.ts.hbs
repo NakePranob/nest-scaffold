@@ -1,0 +1,94 @@
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Delete,
+  Query,
+{{#if hasAuth}}
+  UseGuards,
+{{/if}}
+} from '@nestjs/common';
+{{#if hasSwagger}}
+import { ApiTags } from '@nestjs/swagger';
+{{/if}}
+import { {{pascalName}}Service } from './{{fileBase}}.service';
+import { Create{{entityName}}Dto } from './dto/create-{{entityFile}}.dto';
+import { Update{{entityName}}Dto } from './dto/update-{{entityFile}}.dto';
+{{#if hasPagination}}
+import { Search{{entityName}}Dto } from './dto/search-{{entityFile}}.dto';
+{{/if}}
+{{#if hasAuth}}
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+{{/if}}
+{{#if hasSwagger}}
+import {
+  ApiCreate{{entityName}}Docs,
+  ApiDelete{{entityName}}Docs,
+  ApiFind{{entityName}}ByIdDocs,
+  ApiFind{{pascalName}}Docs,
+  ApiUpdate{{entityName}}Docs,
+} from './swagger/{{entityFile}}-swagger.decorator';
+{{/if}}
+
+{{#if hasSwagger}}
+@ApiTags('{{name}}')
+{{/if}}
+@Controller('{{name}}')
+export class {{pascalName}}Controller {
+  constructor(private readonly {{camelName}}Service: {{pascalName}}Service) {}
+
+  @Post()
+{{#if hasSwagger}}
+  @ApiCreate{{entityName}}Docs()
+{{/if}}
+  create(@Body() dto: Create{{entityName}}Dto) {
+    return this.{{camelName}}Service.create(dto);
+  }
+
+  @Get()
+{{#if hasAuth}}
+  @UseGuards(JwtAuthGuard)
+{{/if}}
+{{#if hasSwagger}}
+  @ApiFind{{pascalName}}Docs()
+{{/if}}
+  findAll({{#if hasPagination}}@Query() dto: Search{{entityName}}Dto{{/if}}) {
+    return this.{{camelName}}Service.findAll({{#if hasPagination}}dto{{/if}});
+  }
+
+  @Get(':id')
+{{#if hasAuth}}
+  @UseGuards(JwtAuthGuard)
+{{/if}}
+{{#if hasSwagger}}
+  @ApiFind{{entityName}}ByIdDocs()
+{{/if}}
+  findById(@Param('id') id: string) {
+    return this.{{camelName}}Service.findById(id);
+  }
+
+  @Patch(':id')
+{{#if hasAuth}}
+  @UseGuards(JwtAuthGuard)
+{{/if}}
+{{#if hasSwagger}}
+  @ApiUpdate{{entityName}}Docs()
+{{/if}}
+  update(@Param('id') id: string, @Body() dto: Update{{entityName}}Dto) {
+    return this.{{camelName}}Service.update(id, dto);
+  }
+
+  @Delete(':id')
+{{#if hasAuth}}
+  @UseGuards(JwtAuthGuard)
+{{/if}}
+{{#if hasSwagger}}
+  @ApiDelete{{entityName}}Docs()
+{{/if}}
+  delete(@Param('id') id: string) {
+    return this.{{camelName}}Service.delete(id);
+  }
+}

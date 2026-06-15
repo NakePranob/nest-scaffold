@@ -1,0 +1,47 @@
+import { SelectQueryBuilder } from 'typeorm';
+import { User } from '../entities/user.entity';
+import { PaginatedResult } from '../../../common/interfaces/paginated-result.interface';
+import { paginate } from '../../../common/helpers/pagination.helper';
+
+export class UserFilterQuery {
+  constructor(private qb: SelectQueryBuilder<User>) {}
+
+  bySearch(search?: string) {
+    if (search) {
+      this.qb.andWhere('user.name ILIKE :search', { search: `%${search}%` });
+    }
+    return this;
+  }
+
+  byRole(role?: string) {
+    if (role) {
+      this.qb.andWhere('user.role = :role', { role });
+    }
+    return this;
+  }
+
+  byActive(isActive?: boolean) {
+    if (isActive !== undefined) {
+      this.qb.andWhere('user.isActive = :isActive', { isActive });
+    }
+    return this;
+  }
+
+  withPagination(page: number, limit: number) {
+    this.qb.skip((page - 1) * limit).take(limit);
+    return this;
+  }
+
+  withDefaultOrder() {
+    this.qb.orderBy('user.createdAt', 'DESC');
+    return this;
+  }
+
+  async execPaginated(
+    page: number,
+    limit: number,
+  ): Promise<PaginatedResult<User>> {
+    const [data, total] = await this.qb.getManyAndCount();
+    return paginate(data, total, page, limit);
+  }
+}

@@ -1,0 +1,11 @@
+export function isUniqueConstraintError(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'driverError' in error &&
+    typeof error.driverError === 'object' &&
+    error.driverError !== null &&
+    'code' in error.driverError &&
+    error.driverError.code === '23505'
+  );
+}

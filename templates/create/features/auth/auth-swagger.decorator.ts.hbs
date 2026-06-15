@@ -1,0 +1,29 @@
+import { applyDecorators } from '@nestjs/common';
+import { ApiOperation } from '@nestjs/swagger';
+import {
+  ApiConflictError,
+  ApiDefaultErrors,
+} from '../../../common/swagger/decorators/api-error-responses.decorator';
+import { ApiSuccessResponse } from '../../../common/swagger/decorators/api-success-response.decorator';
+import { AUTH_ERRORS } from '../auth-error-catalog';
+import { AuthTokenResponseDto } from './auth-response.dto';
+
+export function ApiRegisterDocs() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Register a new user' }),
+    ApiSuccessResponse(AuthTokenResponseDto, 'User registered'),
+    ApiConflictError(
+      AUTH_ERRORS.EMAIL_ALREADY_IN_USE.code,
+      AUTH_ERRORS.EMAIL_ALREADY_IN_USE.message,
+    ),
+    ApiDefaultErrors(),
+  );
+}
+
+export function ApiLoginDocs() {
+  return applyDecorators(
+    ApiOperation({ summary: 'Login with email and password' }),
+    ApiSuccessResponse(AuthTokenResponseDto, 'Logged in'),
+    ApiDefaultErrors(),
+  );
+}

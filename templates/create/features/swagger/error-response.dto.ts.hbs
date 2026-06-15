@@ -1,0 +1,35 @@
+import { ApiProperty } from '@nestjs/swagger';
+
+export class ErrorResponseDto {
+  @ApiProperty({ example: 'USER_NOT_FOUND' })
+  code: string;
+
+  @ApiProperty({ example: 'User not found' })
+  message: string;
+
+  @ApiProperty({
+    nullable: true,
+    oneOf: [{ type: 'array' }, { type: 'object' }],
+    example: null,
+  })
+  errors: unknown[] | Record<string, unknown> | null;
+}
+
+export class ValidationErrorItemDto {
+  @ApiProperty({ example: 'email' })
+  field: string;
+
+  @ApiProperty({ example: 'email must be an email' })
+  message: string;
+}
+
+export class ValidationErrorResponseDto {
+  @ApiProperty({ example: 'VALIDATION_ERROR' })
+  code: string;
+
+  @ApiProperty({ example: 'Validation failed' })
+  message: string;
+
+  @ApiProperty({ type: [ValidationErrorItemDto] })
+  errors: ValidationErrorItemDto[] | null;
+}

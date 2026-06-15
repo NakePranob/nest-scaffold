@@ -1,0 +1,38 @@
+import { Repository } from 'typeorm';
+import { USER_ERRORS } from './user-error-catalog';
+import { UsersService } from './users.service';
+import { User } from './entities/user.entity';
+
+describe('UsersService', () => {
+  let service: UsersService;
+  let repo: Partial<Repository<User>>;
+
+  beforeEach(() => {
+    repo = {
+      create: jest.fn().mockImplementation((dto) => dto),
+      save: jest.fn().mockRejectedValue({
+        driverError: {
+          code: '23505',
+        },
+      }),
+    };
+
+    service = new UsersService(repo as Repository<User>);
+  });
+
+  it('maps unique email conflicts to users module error', async () => {
+    await expect(
+      service.create({
+        email: 'user@example.com',
+        password: 'password123',
+      }),
+    ).rejects.toMatchObject({
+      response: {
+        code: USER_ERRORS.USER_EMAIL_ALREADY_IN_USE.code,
+        message: USER_ERRORS.USER_EMAIL_ALREADY_IN_USE.message,
+        errors: undefined,
+      },
+      status: USER_ERRORS.USER_EMAIL_ALREADY_IN_USE.statusCode,
+    });
+  });
+});

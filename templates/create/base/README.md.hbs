@@ -1,0 +1,28 @@
+# {{projectName}}
+
+NestJS modular backend generated with [@nakedev/nest-scaffold](https://www.npmjs.com/package/@nakedev/nest-scaffold).
+
+## Setup
+
+```bash
+pnpm install
+cp .env.example .env
+{{#if docker}}docker compose up -d{{/if}}
+pnpm run start:dev
+```
+
+{{#if swagger}}Swagger: http://localhost:3000/api{{/if}}
+
+## Scripts
+
+- `pnpm run start:dev` — development with watch
+- `pnpm run build` — compile
+- `pnpm run test` — unit tests
+{{#if e2e}}- `pnpm run test:e2e` — e2e tests{{/if}}
+{{#if seeds}}- `pnpm run seed` — seed database{{/if}}
+
+## Generate modules
+
+```bash
+nest-scaffold generate module orders
+```
