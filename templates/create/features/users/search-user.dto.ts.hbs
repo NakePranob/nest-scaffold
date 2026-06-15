@@ -1,20 +1,28 @@
 import { IsOptional, IsString, IsBoolean } from 'class-validator';
 import { Transform } from 'class-transformer';
+{{#if hasSwagger}}
 import { ApiPropertyOptional } from '@nestjs/swagger';
+{{/if}}
 import { PaginationDto } from '{{commonFromNested}}/dto/pagination.dto';
 
 export class SearchUserDto extends PaginationDto {
+{{#if hasSwagger}}
   @ApiPropertyOptional()
+{{/if}}
   @IsOptional()
   @IsString()
   search?: string;
 
+{{#if hasSwagger}}
   @ApiPropertyOptional()
+{{/if}}
   @IsOptional()
   @IsString()
   role?: string;
 
+{{#if hasSwagger}}
   @ApiPropertyOptional()
+{{/if}}
   @IsOptional()
   @IsBoolean()
   @Transform(({ value }) => !(value === 'false' || value === false))

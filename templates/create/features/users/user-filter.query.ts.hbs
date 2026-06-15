@@ -1,47 +1,30 @@
 import { SelectQueryBuilder } from 'typeorm';
 import { User } from '../entities/user.entity';
-import { PaginatedResult } from '{{commonFromNested}}/interfaces/paginated-result.interface';
-import { paginate } from '{{commonFromNested}}/helpers/pagination.helper';
+import { BaseFilterQuery } from '{{commonFromNested}}/helpers/base-filter.query';
 
-export class UserFilterQuery {
-  constructor(private qb: SelectQueryBuilder<User>) {}
+export class UserFilterQuery extends BaseFilterQuery<User> {
+  constructor(qb: SelectQueryBuilder<User>) {
+    super(qb);
+  }
 
   bySearch(search?: string) {
     if (search) {
-      this.qb.andWhere('user.name ILIKE :search', { search: `%${search}%` });
+      this.qb.andWhere(`${this.qb.alias}.name ILIKE :search`, { search: `%${search}%` });
     }
     return this;
   }
 
   byRole(role?: string) {
     if (role) {
-      this.qb.andWhere('user.role = :role', { role });
+      this.qb.andWhere(`${this.qb.alias}.role = :role`, { role });
     }
     return this;
   }
 
   byActive(isActive?: boolean) {
     if (isActive !== undefined) {
-      this.qb.andWhere('user.isActive = :isActive', { isActive });
+      this.qb.andWhere(`${this.qb.alias}.isActive = :isActive`, { isActive });
     }
     return this;
-  }
-
-  withPagination(page: number, limit: number) {
-    this.qb.skip((page - 1) * limit).take(limit);
-    return this;
-  }
-
-  withDefaultOrder() {
-    this.qb.orderBy('user.createdAt', 'DESC');
-    return this;
-  }
-
-  async execPaginated(
-    page: number,
-    limit: number,
-  ): Promise<PaginatedResult<User>> {
-    const [data, total] = await this.qb.getManyAndCount();
-    return paginate(data, total, page, limit);
   }
 }

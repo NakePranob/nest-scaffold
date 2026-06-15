@@ -3,13 +3,17 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { {{entityName}} } from './entities/{{entityFile}}.entity';
 {{/if}}
+{{#if hasController}}
 import { {{pascalName}}Controller } from './{{fileBase}}.controller';
+{{/if}}
+{{#if hasService}}
 import { {{pascalName}}Service } from './{{fileBase}}.service';
+{{/if}}
 
 @Module({
   imports: [{{#if hasTypeorm}}TypeOrmModule.forFeature([{{entityName}}]){{/if}}],
-  controllers: [{{pascalName}}Controller],
-  providers: [{{pascalName}}Service],
-  exports: [{{pascalName}}Service],
+  {{#if hasController}}controllers: [{{pascalName}}Controller],{{/if}}
+  {{#if hasService}}providers: [{{pascalName}}Service],
+  exports: [{{pascalName}}Service],{{/if}}
 })
 export class {{moduleClass}} {}

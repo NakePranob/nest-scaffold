@@ -24,7 +24,10 @@ try {
   run(`node "${cliBin}" create smoke-app --defaults`);
   run('pnpm install --ignore-scripts', projectDir);
   run('pnpm exec nest build', projectDir);
-  run(`node "${cliBin}" generate module orders`, projectDir);
+  run(`node "${cliBin}" generate module orders --full`, projectDir);
+  run('pnpm exec nest build', projectDir);
+  run(`node "${cliBin}" generate service new3`, projectDir);
+  run(`node "${cliBin}" generate controller new3`, projectDir);
   run('pnpm exec nest build', projectDir);
 
   console.log('\n✓ Smoke test passed\n');

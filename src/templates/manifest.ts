@@ -76,6 +76,11 @@ export function getCreateTemplateEntries(): TemplateEntry[] {
       output: 'src/common/helpers/pagination.helper.ts',
       when: (c) => c.pagination,
     },
+    {
+      template: 'create/features/pagination/base-filter.query.ts.hbs',
+      output: 'src/common/helpers/base-filter.query.ts',
+      when: (c) => c.pagination,
+    },
 
     // Swagger
     {
@@ -294,6 +299,8 @@ export function getCreateTemplateEntries(): TemplateEntry[] {
 
 export function getGenerateModuleEntries(
   config: ScaffoldConfig,
+  isFull?: boolean,
+  includeEntity?: boolean,
 ): TemplateEntry[] {
   const modulePath = (
     ctx: TemplateContext,
@@ -306,80 +313,87 @@ export function getGenerateModuleEntries(
       ...rest,
     );
 
+  const hasTypeorm = includeEntity ?? config.typeorm;
+
   const entries: TemplateEntry[] = [
     {
       template: 'generate/module/module.ts.hbs',
       output: (ctx) => modulePath(ctx, `${ctx.fileBase}.module.ts`),
     },
-    {
-      template: 'generate/module/service.ts.hbs',
-      output: (ctx) => modulePath(ctx, `${ctx.fileBase}.service.ts`),
-    },
-    {
-      template: 'generate/module/controller.ts.hbs',
-      output: (ctx) => modulePath(ctx, `${ctx.fileBase}.controller.ts`),
-    },
-    {
-      template: 'generate/module/service.spec.ts.hbs',
-      output: (ctx) => modulePath(ctx, `${ctx.fileBase}.service.spec.ts`),
-    },
-    {
-      template: 'generate/module/controller.spec.ts.hbs',
-      output: (ctx) => modulePath(ctx, `${ctx.fileBase}.controller.spec.ts`),
-    },
-    {
-      template: 'generate/module/create.dto.ts.hbs',
-      output: (ctx) => modulePath(ctx, 'dto', `create-${ctx.entityFile}.dto.ts`),
-    },
-    {
-      template: 'generate/module/update.dto.ts.hbs',
-      output: (ctx) => modulePath(ctx, 'dto', `update-${ctx.entityFile}.dto.ts`),
-    },
   ];
 
-  if (config.typeorm) {
+  if (isFull) {
+    entries.push(
+      {
+        template: 'generate/module/service.ts.hbs',
+        output: (ctx) => modulePath(ctx, `${ctx.fileBase}.service.ts`),
+      },
+      {
+        template: 'generate/module/controller.ts.hbs',
+        output: (ctx) => modulePath(ctx, `${ctx.fileBase}.controller.ts`),
+      },
+      {
+        template: 'generate/module/service.spec.ts.hbs',
+        output: (ctx) => modulePath(ctx, `${ctx.fileBase}.service.spec.ts`),
+      },
+      {
+        template: 'generate/module/controller.spec.ts.hbs',
+        output: (ctx) => modulePath(ctx, `${ctx.fileBase}.controller.spec.ts`),
+      },
+      {
+        template: 'generate/module/create.dto.ts.hbs',
+        output: (ctx) => modulePath(ctx, 'dto', `create-${ctx.entityFile}.dto.ts`),
+      },
+      {
+        template: 'generate/module/update.dto.ts.hbs',
+        output: (ctx) => modulePath(ctx, 'dto', `update-${ctx.entityFile}.dto.ts`),
+      },
+    );
+
+    if (config.pagination) {
+      entries.push(
+        {
+          template: 'generate/module/search.dto.ts.hbs',
+          output: (ctx) =>
+            modulePath(ctx, 'dto', `search-${ctx.entityFile}.dto.ts`),
+        },
+        {
+          template: 'generate/module/filter.query.ts.hbs',
+          output: (ctx) =>
+            modulePath(ctx, 'queries', `${ctx.entityFile}-filter.query.ts`),
+        },
+      );
+    }
+
+    if (config.responseEnvelope) {
+      entries.push({
+        template: 'generate/module/error-catalog.ts.hbs',
+        output: (ctx) => modulePath(ctx, `${ctx.entityFile}-error-catalog.ts`),
+      });
+    }
+
+    if (config.swagger) {
+      entries.push(
+        {
+          template: 'generate/module/swagger.decorator.ts.hbs',
+          output: (ctx) =>
+            modulePath(ctx, 'swagger', `${ctx.entityFile}-swagger.decorator.ts`),
+        },
+        {
+          template: 'generate/module/response.dto.ts.hbs',
+          output: (ctx) =>
+            modulePath(ctx, 'swagger', `${ctx.entityFile}-response.dto.ts`),
+        },
+      );
+    }
+  }
+
+  if (hasTypeorm) {
     entries.push({
       template: 'generate/module/entity.ts.hbs',
       output: (ctx) =>
         modulePath(ctx, 'entities', `${ctx.entityFile}.entity.ts`),
     });
-  }
-
-  if (config.pagination) {
-    entries.push(
-      {
-        template: 'generate/module/search.dto.ts.hbs',
-        output: (ctx) =>
-          modulePath(ctx, 'dto', `search-${ctx.entityFile}.dto.ts`),
-      },
-      {
-        template: 'generate/module/filter.query.ts.hbs',
-        output: (ctx) =>
-          modulePath(ctx, 'queries', `${ctx.entityFile}-filter.query.ts`),
-      },
-    );
-  }
-
-  if (config.responseEnvelope) {
-    entries.push({
-      template: 'generate/module/error-catalog.ts.hbs',
-      output: (ctx) => modulePath(ctx, `${ctx.entityFile}-error-catalog.ts`),
-    });
-  }
-
-  if (config.swagger) {
-    entries.push(
-      {
-        template: 'generate/module/swagger.decorator.ts.hbs',
-        output: (ctx) =>
-          modulePath(ctx, 'swagger', `${ctx.entityFile}-swagger.decorator.ts`),
-      },
-      {
-        template: 'generate/module/response.dto.ts.hbs',
-        output: (ctx) =>
-          modulePath(ctx, 'swagger', `${ctx.entityFile}-response.dto.ts`),
-      },
-    );
   }
 
   return entries;

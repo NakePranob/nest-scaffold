@@ -1,0 +1,13 @@
+import { Controller } from '@nestjs/common';
+{{#if hasService}}
+import { {{pascalName}}Service } from './{{fileBase}}.service';
+{{/if}}
+
+@Controller('{{name}}')
+export class {{pascalName}}Controller {
+  {{#if hasService}}
+  constructor(private readonly {{camelName}}Service: {{pascalName}}Service) {}
+  {{else}}
+  constructor() {}
+  {{/if}}
+}

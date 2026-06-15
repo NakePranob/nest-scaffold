@@ -1,0 +1,7 @@
+import { Module } from '@nestjs/common';
+import { {{pascalName}}Controller } from './{{fileBase}}.controller';
+
+@Module({
+  controllers: [{{pascalName}}Controller],
+})
+export class {{moduleClass}} {}

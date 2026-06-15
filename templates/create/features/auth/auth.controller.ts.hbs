@@ -1,26 +1,34 @@
 import { Controller, Post, Body } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
+{{#if hasSwagger}}
+import { ApiTags } from '@nestjs/swagger';
 import {
   ApiLoginDocs,
   ApiRegisterDocs,
 } from './swagger/auth-swagger.decorator';
+{{/if}}
 
+{{#if hasSwagger}}
 @ApiTags('auth')
-@Controller('auth')
+{{/if}}
+@Controller('{{#if moduleVersioning}}{{moduleVersion}}/{{/if}}auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
+{{#if hasSwagger}}
   @ApiRegisterDocs()
+{{/if}}
   register(@Body() dto: RegisterDto) {
     return this.authService.register(dto);
   }
 
   @Post('login')
+{{#if hasSwagger}}
   @ApiLoginDocs()
+{{/if}}
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
   }

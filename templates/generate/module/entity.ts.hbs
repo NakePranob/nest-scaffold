@@ -1,7 +1,6 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  Column,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -10,9 +9,6 @@ import {
 export class {{entityName}} {
   @PrimaryGeneratedColumn('uuid')
   id: string;
-
-  @Column()
-  name: string;
 
   @CreateDateColumn()
   createdAt: Date;

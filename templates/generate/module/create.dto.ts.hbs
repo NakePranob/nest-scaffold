@@ -1,13 +1,1 @@
-import { IsString, MinLength } from 'class-validator';
-{{#if hasSwagger}}
-import { ApiProperty } from '@nestjs/swagger';
-{{/if}}
-
-export class Create{{entityName}}Dto {
-{{#if hasSwagger}}
-  @ApiProperty({ example: 'Example name' })
-{{/if}}
-  @IsString()
-  @MinLength(1)
-  name: string;
-}
+export class Create{{entityName}}Dto {}

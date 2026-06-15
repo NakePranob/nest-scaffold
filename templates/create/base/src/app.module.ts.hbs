@@ -1,21 +1,21 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule{{#if typeorm}}, ConfigService{{/if}} } from '@nestjs/config';
-{{#if typeorm}}
+import { ConfigModule{{#if hasTypeorm}}, ConfigService{{/if}} } from '@nestjs/config';
+{{#if hasTypeorm}}
 import { TypeOrmModule } from '@nestjs/typeorm';
 {{/if}}
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-{{#if auth}}
+{{#if hasAuth}}
 import { AuthModule } from '{{modulesImportPrefix}}/auth/auth.module';
 {{/if}}
-{{#if usersModule}}
+{{#if hasUsersModule}}
 import { UsersModule } from '{{modulesImportPrefix}}/users/users.module';
 {{/if}}
 
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-{{#if typeorm}}
+{{#if hasTypeorm}}
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -31,10 +31,10 @@ import { UsersModule } from '{{modulesImportPrefix}}/users/users.module';
       }),
     }),
 {{/if}}
-{{#if auth}}
+{{#if hasAuth}}
     AuthModule,
 {{/if}}
-{{#if usersModule}}
+{{#if hasUsersModule}}
     UsersModule,
 {{/if}}
   ],

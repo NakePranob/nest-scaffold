@@ -17,6 +17,7 @@ export function buildTemplateContext(
   config: ScaffoldConfig,
   naming?: ModuleNaming,
   moduleVersion?: string,
+  options?: { includeEntity?: boolean; hasService?: boolean; hasController?: boolean },
 ): TemplateContext {
   const moduleNaming = naming ?? resolveModuleNaming('example');
   const version =
@@ -27,6 +28,9 @@ export function buildTemplateContext(
     version,
   );
 
+  const hasTypeorm =
+    options?.includeEntity !== undefined ? options.includeEntity : config.typeorm;
+
   return {
     ...config,
     ...moduleNaming,
@@ -35,9 +39,12 @@ export function buildTemplateContext(
     stackLabel: STACK_LABEL,
     hasAuth: config.auth,
     hasSwagger: config.swagger,
-    hasTypeorm: config.typeorm,
+    hasTypeorm,
     hasPagination: config.pagination,
     hasEnvelope: config.responseEnvelope,
+    hasUsersModule: config.usersModule,
+    hasService: options?.hasService ?? true,
+    hasController: options?.hasController ?? true,
   };
 }
 

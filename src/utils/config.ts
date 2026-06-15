@@ -51,17 +51,15 @@ export function enforceDependencies(
 ): ScaffoldConfig {
   const next = { ...config };
 
-  if (!next.docker) {
-    next.typeorm = false;
-  }
+  next.typeorm = true;
+  next.responseEnvelope = true;
+  next.pagination = true;
+  next.orm = 'typeorm';
+  next.database = 'postgres';
 
-  if (!next.typeorm) {
-    next.seeds = false;
-    next.usersModule = false;
-  }
-
-  if (!next.usersModule && next.auth) {
+  if (!next.usersModule) {
     next.auth = false;
+    next.seeds = false;
   }
 
   return next;

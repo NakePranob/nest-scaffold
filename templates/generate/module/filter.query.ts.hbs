@@ -1,35 +1,18 @@
 import { SelectQueryBuilder } from 'typeorm';
 import { {{entityName}} } from '../entities/{{entityFile}}.entity';
-import { PaginatedResult } from '{{commonFromNested}}/interfaces/paginated-result.interface';
-import { paginate } from '{{commonFromNested}}/helpers/pagination.helper';
+import { BaseFilterQuery } from '{{commonFromNested}}/helpers/base-filter.query';
 
-export class {{entityName}}FilterQuery {
-  constructor(private qb: SelectQueryBuilder<{{entityName}}>) {}
+export class {{entityName}}FilterQuery extends BaseFilterQuery<{{entityName}}> {
+  constructor(qb: SelectQueryBuilder<{{entityName}}>) {
+    super(qb);
+  }
 
   bySearch(search?: string) {
     if (search) {
-      this.qb.andWhere('{{queryAlias}}.name ILIKE :search', {
+      this.qb.andWhere(`${this.qb.alias}.name ILIKE :search`, {
         search: `%${search}%`,
       });
     }
     return this;
-  }
-
-  withPagination(page: number, limit: number) {
-    this.qb.skip((page - 1) * limit).take(limit);
-    return this;
-  }
-
-  withDefaultOrder() {
-    this.qb.orderBy('{{queryAlias}}.createdAt', 'DESC');
-    return this;
-  }
-
-  async execPaginated(
-    page: number,
-    limit: number,
-  ): Promise<PaginatedResult<{{entityName}}>> {
-    const [data, total] = await this.qb.getManyAndCount();
-    return paginate(data, total, page, limit);
   }
 }

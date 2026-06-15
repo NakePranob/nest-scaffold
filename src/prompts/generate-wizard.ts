@@ -1,9 +1,14 @@
-import { input, select } from '@inquirer/prompts';
+import { confirm, input, select } from '@inquirer/prompts';
 import { ScaffoldConfig } from '../types';
 import {
   listModuleVersions,
   normalizeModuleVersion,
 } from '../utils/module-paths';
+
+export interface GenerateOptions {
+  isFull: boolean;
+  includeEntity: boolean;
+}
 
 export async function promptModuleVersion(
   projectRoot: string,
@@ -38,9 +43,14 @@ export async function promptModuleVersion(
   });
 
   if (selected === '__new__') {
+    const nextVersion = versions.reduce((max, v) => {
+      const num = parseInt(v.slice(1), 10);
+      return isNaN(num) ? max : Math.max(max, num);
+    }, 0) + 1;
+
     const value = await input({
       message: 'New version folder name:',
-      default: 'v2',
+      default: `v${nextVersion}`,
       validate: (answer) => {
         try {
           normalizeModuleVersion(answer);
@@ -55,4 +65,17 @@ export async function promptModuleVersion(
   }
 
   return selected;
+}
+
+export async function promptGenerateOptions(options?: {
+  presetFull?: boolean;
+}): Promise<GenerateOptions> {
+  const isFull =
+    options?.presetFull ??
+    (await confirm({
+      message: 'Generate full CRUD (controller + service + DTOs)?',
+      default: true,
+    }));
+
+  return { isFull, includeEntity: isFull };
 }

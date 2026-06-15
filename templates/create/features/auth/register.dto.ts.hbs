@@ -1,17 +1,25 @@
 import { IsEmail, IsString, MinLength, IsOptional } from 'class-validator';
+{{#if hasSwagger}}
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+{{/if}}
 
 export class RegisterDto {
+{{#if hasSwagger}}
   @ApiProperty({ example: 'user@example.com' })
+{{/if}}
   @IsEmail()
   email: string;
 
+{{#if hasSwagger}}
   @ApiProperty({ example: 'password123' })
+{{/if}}
   @IsString()
   @MinLength(6)
   password: string;
 
+{{#if hasSwagger}}
   @ApiPropertyOptional({ example: 'John' })
+{{/if}}
   @IsOptional()
   @IsString()
   name?: string;

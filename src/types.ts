@@ -48,6 +48,9 @@ export interface TemplateContext
   hasTypeorm: boolean;
   hasPagination: boolean;
   hasEnvelope: boolean;
+  hasUsersModule: boolean;
+  hasService: boolean;
+  hasController: boolean;
 }
 
 export type { ModulePathContext };

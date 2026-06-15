@@ -1,0 +1,25 @@
+import { ObjectLiteral, SelectQueryBuilder } from 'typeorm';
+import { PaginatedResult } from '../interfaces/paginated-result.interface';
+import { paginate } from '../helpers/pagination.helper';
+
+export class BaseFilterQuery<T extends ObjectLiteral> {
+  constructor(protected qb: SelectQueryBuilder<T>) {}
+
+  withPagination(page: number, limit: number) {
+    this.qb.skip((page - 1) * limit).take(limit);
+    return this;
+  }
+
+  withDefaultOrder() {
+    this.qb.orderBy(`${this.qb.alias}.createdAt`, 'DESC');
+    return this;
+  }
+
+  async execPaginated(
+    page: number,
+    limit: number,
+  ): Promise<PaginatedResult<T>> {
+    const [data, total] = await this.qb.getManyAndCount();
+    return paginate(data, total, page, limit);
+  }
+}

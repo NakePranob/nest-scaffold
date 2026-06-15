@@ -1,18 +1,26 @@
 import { IsOptional, IsString, IsBoolean } from 'class-validator';
+{{#if hasSwagger}}
 import { ApiPropertyOptional } from '@nestjs/swagger';
+{{/if}}
 
 export class UpdateUserDto {
+{{#if hasSwagger}}
   @ApiPropertyOptional()
+{{/if}}
   @IsOptional()
   @IsString()
   name?: string;
 
+{{#if hasSwagger}}
   @ApiPropertyOptional()
+{{/if}}
   @IsOptional()
   @IsString()
   role?: string;
 
+{{#if hasSwagger}}
   @ApiPropertyOptional()
+{{/if}}
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
