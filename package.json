@@ -1,6 +1,6 @@
 {
   "name": "@nakedev/nest-scaffold",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Scaffold NestJS modular backend projects with selectable features",
   "bin": {
     "nest-scaffold": "./bin/nest-scaffold.js"

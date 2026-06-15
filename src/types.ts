@@ -1,6 +1,11 @@
+import type { ModulePathContext } from './utils/module-paths';
+
 export interface ScaffoldConfig {
   version: 1;
   projectName: string;
+  moduleVersioning: boolean;
+  defaultModuleVersion: string;
+  moduleVersions: string[];
   swagger: boolean;
   docker: boolean;
   typeorm: boolean;
@@ -36,10 +41,13 @@ export interface StackVersionsContext {
 export interface TemplateContext
   extends ScaffoldConfig,
     ModuleNaming,
-    StackVersionsContext {
+    StackVersionsContext,
+    ModulePathContext {
   hasAuth: boolean;
   hasSwagger: boolean;
   hasTypeorm: boolean;
   hasPagination: boolean;
   hasEnvelope: boolean;
 }
+
+export type { ModulePathContext };

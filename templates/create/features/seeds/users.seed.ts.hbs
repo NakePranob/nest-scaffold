@@ -2,7 +2,7 @@ import { INestApplicationContext, Logger } from '@nestjs/common';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { hashPassword } from '../../common/helpers/hash-password';
-import { User } from '../../modules/users/entities/user.entity';
+import { User } from '{{usersEntityFromSeeds}}';
 
 const logger = new Logger('UsersSeed');
 

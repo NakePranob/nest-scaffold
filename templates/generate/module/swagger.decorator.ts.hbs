@@ -5,12 +5,12 @@ import {
   ApiDefaultErrors,
   ApiNotFoundError,
   ApiProtectedErrors,
-} from '../../../common/swagger/decorators/api-error-responses.decorator';
+} from '{{commonFromNested}}/swagger/decorators/api-error-responses.decorator';
 import {
   ApiEmptySuccessResponse,
   ApiPaginatedSuccessResponse,
   ApiSuccessResponse,
-} from '../../../common/swagger/decorators/api-success-response.decorator';
+} from '{{commonFromNested}}/swagger/decorators/api-success-response.decorator';
 import { {{errorPrefix}}_ERRORS } from '../{{entityFile}}-error-catalog';
 import { {{entityName}}ResponseDto } from './{{entityFile}}-response.dto';
 

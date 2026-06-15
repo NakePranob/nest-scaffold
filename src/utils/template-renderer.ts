@@ -4,6 +4,7 @@ import Handlebars from 'handlebars';
 import { ScaffoldConfig, TemplateContext, ModuleNaming } from '../types';
 import { STACK_LABEL, STACK_VERSIONS } from '../stack-versions';
 import { resolveModuleNaming } from './naming';
+import { resolveModulePathContext } from './module-paths';
 
 Handlebars.registerHelper('eq', (a, b) => a === b);
 Handlebars.registerHelper('json', (value) => JSON.stringify(value));
@@ -15,12 +16,21 @@ export function getTemplatesRoot(): string {
 export function buildTemplateContext(
   config: ScaffoldConfig,
   naming?: ModuleNaming,
+  moduleVersion?: string,
 ): TemplateContext {
   const moduleNaming = naming ?? resolveModuleNaming('example');
+  const version =
+    moduleVersion ??
+    (config.moduleVersioning ? config.defaultModuleVersion : '');
+  const pathContext = resolveModulePathContext(
+    config.moduleVersioning,
+    version,
+  );
 
   return {
     ...config,
     ...moduleNaming,
+    ...pathContext,
     stack: { ...STACK_VERSIONS },
     stackLabel: STACK_LABEL,
     hasAuth: config.auth,

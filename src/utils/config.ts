@@ -16,8 +16,27 @@ export async function readConfig(
     return null;
   }
 
-  const raw = await fs.readJson(configPath);
-  return raw as ScaffoldConfig;
+  const raw = (await fs.readJson(configPath)) as Partial<ScaffoldConfig>;
+  return {
+    version: 1,
+    projectName: raw.projectName ?? path.basename(projectRoot),
+    moduleVersioning: raw.moduleVersioning ?? false,
+    defaultModuleVersion: raw.defaultModuleVersion ?? '',
+    moduleVersions: raw.moduleVersions ?? [],
+    swagger: raw.swagger ?? false,
+    docker: raw.docker ?? false,
+    typeorm: raw.typeorm ?? false,
+    responseEnvelope: raw.responseEnvelope ?? false,
+    pagination: raw.pagination ?? false,
+    auth: raw.auth ?? false,
+    usersModule: raw.usersModule ?? false,
+    seeds: raw.seeds ?? false,
+    e2e: raw.e2e ?? false,
+    docs: raw.docs ?? false,
+    httpAdapter: raw.httpAdapter ?? 'fastify',
+    orm: raw.orm ?? 'typeorm',
+    database: raw.database ?? 'postgres',
+  };
 }
 
 export async function writeConfig(

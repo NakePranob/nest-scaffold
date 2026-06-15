@@ -1,7 +1,7 @@
 import path from 'node:path';
 import fs from 'fs-extra';
 import pc from 'picocolors';
-import { readConfig } from '../utils/config';
+import { readConfig, writeConfig } from '../utils/config';
 import { detectConfig } from '../utils/detector';
 import { resolveModuleNaming } from '../utils/naming';
 import {
@@ -10,15 +10,39 @@ import {
 } from '../utils/template-renderer';
 import { registerModuleInAppModule } from '../utils/app-module-patcher';
 import { getGenerateModuleEntries } from '../templates/manifest';
+import { promptModuleVersion } from '../prompts/generate-wizard';
+import {
+  moduleFeaturePath,
+  moduleImportPath,
+} from '../utils/module-paths';
 
-export async function generateModuleCommand(name: string): Promise<void> {
+export async function generateModuleCommand(
+  name: string,
+  options?: { moduleVersion?: string },
+): Promise<void> {
   const projectRoot = process.cwd();
   const naming = resolveModuleNaming(name);
+
+  let config = (await readConfig(projectRoot)) ?? (await detectConfig(projectRoot));
+  const moduleVersion = await promptModuleVersion(
+    projectRoot,
+    config,
+    options?.moduleVersion,
+  );
+
+  if (moduleVersion && !config.moduleVersions.includes(moduleVersion)) {
+    config = {
+      ...config,
+      moduleVersioning: true,
+      moduleVersions: [...config.moduleVersions, moduleVersion].sort(),
+      defaultModuleVersion: config.defaultModuleVersion || moduleVersion,
+    };
+    await writeConfig(projectRoot, config);
+  }
+
   const moduleDir = path.join(
     projectRoot,
-    'src',
-    'modules',
-    naming.name,
+    moduleFeaturePath(config.moduleVersioning, moduleVersion, naming.name),
   );
 
   if (await fs.pathExists(moduleDir)) {
@@ -27,21 +51,29 @@ export async function generateModuleCommand(name: string): Promise<void> {
     );
   }
 
-  const config = (await readConfig(projectRoot)) ?? (await detectConfig(projectRoot));
+  const versionLabel = moduleVersion ? `${moduleVersion}/` : '';
+  console.log(
+    pc.cyan(`\nGenerating module "${versionLabel}${naming.name}"...\n`),
+  );
 
-  console.log(pc.cyan(`\nGenerating module "${naming.name}"...\n`));
-
-  const context = buildTemplateContext(config, naming);
+  const context = buildTemplateContext(config, naming, moduleVersion);
   const entries = getGenerateModuleEntries(config);
 
   await applyTemplateEntries(projectRoot, entries, context);
 
-  const importPath = `./modules/${naming.name}/${naming.fileBase}.module`;
+  const importPath = moduleImportPath(
+    config.moduleVersioning,
+    moduleVersion,
+    naming.name,
+    naming.fileBase,
+  );
   await registerModuleInAppModule(
     projectRoot,
     naming.moduleClass,
     importPath,
   );
 
-  console.log(pc.green(`\n✓ Module "${naming.name}" generated successfully!\n`));
+  console.log(
+    pc.green(`\n✓ Module "${versionLabel}${naming.name}" generated successfully!\n`),
+  );
 }

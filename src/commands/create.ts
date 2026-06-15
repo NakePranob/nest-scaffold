@@ -64,6 +64,9 @@ function getDefaultConfig(projectName: string): ScaffoldConfig {
   return enforceDependencies({
     version: 1,
     projectName,
+    moduleVersioning: false,
+    defaultModuleVersion: '',
+    moduleVersions: [],
     swagger: true,
     docker: true,
     typeorm: true,

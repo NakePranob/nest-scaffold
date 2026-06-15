@@ -1,11 +1,34 @@
 import path from 'node:path';
 import fs from 'fs-extra';
 import { ScaffoldConfig } from '../types';
+import {
+  detectModuleVersioning,
+  listModuleVersions,
+} from './module-paths';
+
+async function hasModuleAt(
+  projectRoot: string,
+  versioned: boolean,
+  version: string,
+  feature: string,
+  fileName: string,
+): Promise<boolean> {
+  const segments = [projectRoot, 'src', 'modules'];
+  if (versioned) {
+    segments.push(version);
+  }
+  segments.push(feature, fileName);
+  return fs.pathExists(path.join(...segments));
+}
 
 export async function detectConfig(
   projectRoot: string,
 ): Promise<ScaffoldConfig> {
   const src = path.join(projectRoot, 'src');
+  const versioning = await detectModuleVersioning(projectRoot);
+  const version = versioning.defaultModuleVersion;
+  const versioned = versioning.moduleVersioning;
+
   const hasSwagger = await fs.pathExists(
     path.join(src, 'common', 'swagger', 'setup-swagger.ts'),
   );
@@ -15,11 +38,19 @@ export async function detectConfig(
   const hasPagination = await fs.pathExists(
     path.join(src, 'common', 'dto', 'pagination.dto.ts'),
   );
-  const hasAuth = await fs.pathExists(
-    path.join(src, 'modules', 'auth', 'auth.module.ts'),
+  const hasAuth = await hasModuleAt(
+    projectRoot,
+    versioned,
+    version,
+    'auth',
+    'auth.module.ts',
   );
-  const hasUsers = await fs.pathExists(
-    path.join(src, 'modules', 'users', 'users.module.ts'),
+  const hasUsers = await hasModuleAt(
+    projectRoot,
+    versioned,
+    version,
+    'users',
+    'users.module.ts',
   );
   const hasTypeorm = await fs.pathExists(path.join(src, 'app.module.ts'))
     ? (await fs.readFile(path.join(src, 'app.module.ts'), 'utf8')).includes(
@@ -43,9 +74,17 @@ export async function detectConfig(
     path.join(projectRoot, 'package.json'),
   )) as { name?: string };
 
+  const moduleVersions =
+    versioning.moduleVersions.length > 0
+      ? versioning.moduleVersions
+      : await listModuleVersions(projectRoot);
+
   return {
     version: 1,
     projectName: packageJson.name ?? path.basename(projectRoot),
+    moduleVersioning: versioning.moduleVersioning,
+    defaultModuleVersion: versioning.defaultModuleVersion,
+    moduleVersions,
     swagger: hasSwagger,
     docker: hasDocker,
     typeorm: hasTypeorm,

@@ -1,7 +1,16 @@
 import { TemplateEntry } from '../utils/template-renderer';
-import { ScaffoldConfig } from '../types';
+import { ScaffoldConfig, TemplateContext } from '../types';
+import { moduleFeaturePath } from '../utils/module-paths';
 
 const always = () => true;
+
+function featurePath(
+  feature: string,
+  ...rest: string[]
+): (ctx: TemplateContext) => string {
+  return (ctx) =>
+    moduleFeaturePath(ctx.moduleVersioning, ctx.moduleVersion, feature, ...rest);
+}
 
 export function getCreateTemplateEntries(): TemplateEntry[] {
   return [
@@ -120,114 +129,114 @@ export function getCreateTemplateEntries(): TemplateEntry[] {
     // Auth module
     {
       template: 'create/features/auth/auth.module.ts.hbs',
-      output: 'src/modules/auth/auth.module.ts',
+      output: featurePath('auth', 'auth.module.ts'),
       when: (c) => c.auth,
     },
     {
       template: 'create/features/auth/auth.controller.ts.hbs',
-      output: 'src/modules/auth/auth.controller.ts',
+      output: featurePath('auth', 'auth.controller.ts'),
       when: (c) => c.auth,
     },
     {
       template: 'create/features/auth/auth.service.ts.hbs',
-      output: 'src/modules/auth/auth.service.ts',
+      output: featurePath('auth', 'auth.service.ts'),
       when: (c) => c.auth,
     },
     {
       template: 'create/features/auth/auth.service.spec.ts.hbs',
-      output: 'src/modules/auth/auth.service.spec.ts',
+      output: featurePath('auth', 'auth.service.spec.ts'),
       when: (c) => c.auth,
     },
     {
       template: 'create/features/auth/jwt.strategy.ts.hbs',
-      output: 'src/modules/auth/strategies/jwt.strategy.ts',
+      output: featurePath('auth', 'strategies', 'jwt.strategy.ts'),
       when: (c) => c.auth,
     },
     {
       template: 'create/features/auth/login.dto.ts.hbs',
-      output: 'src/modules/auth/dto/login.dto.ts',
+      output: featurePath('auth', 'dto', 'login.dto.ts'),
       when: (c) => c.auth,
     },
     {
       template: 'create/features/auth/register.dto.ts.hbs',
-      output: 'src/modules/auth/dto/register.dto.ts',
+      output: featurePath('auth', 'dto', 'register.dto.ts'),
       when: (c) => c.auth,
     },
     {
       template: 'create/features/auth/auth-error-catalog.ts.hbs',
-      output: 'src/modules/auth/auth-error-catalog.ts',
+      output: featurePath('auth', 'auth-error-catalog.ts'),
       when: (c) => c.auth && c.responseEnvelope,
     },
     {
       template: 'create/features/auth/auth-swagger.decorator.ts.hbs',
-      output: 'src/modules/auth/swagger/auth-swagger.decorator.ts',
+      output: featurePath('auth', 'swagger', 'auth-swagger.decorator.ts'),
       when: (c) => c.auth && c.swagger,
     },
     {
       template: 'create/features/auth/auth-response.dto.ts.hbs',
-      output: 'src/modules/auth/swagger/auth-response.dto.ts',
+      output: featurePath('auth', 'swagger', 'auth-response.dto.ts'),
       when: (c) => c.auth && c.swagger,
     },
 
     // Users module
     {
       template: 'create/features/users/users.module.ts.hbs',
-      output: 'src/modules/users/users.module.ts',
+      output: featurePath('users', 'users.module.ts'),
       when: (c) => c.usersModule,
     },
     {
       template: 'create/features/users/users.controller.ts.hbs',
-      output: 'src/modules/users/users.controller.ts',
+      output: featurePath('users', 'users.controller.ts'),
       when: (c) => c.usersModule,
     },
     {
       template: 'create/features/users/users.service.ts.hbs',
-      output: 'src/modules/users/users.service.ts',
+      output: featurePath('users', 'users.service.ts'),
       when: (c) => c.usersModule,
     },
     {
       template: 'create/features/users/users.service.spec.ts.hbs',
-      output: 'src/modules/users/users.service.spec.ts',
+      output: featurePath('users', 'users.service.spec.ts'),
       when: (c) => c.usersModule,
     },
     {
       template: 'create/features/users/user.entity.ts.hbs',
-      output: 'src/modules/users/entities/user.entity.ts',
+      output: featurePath('users', 'entities', 'user.entity.ts'),
       when: (c) => c.usersModule,
     },
     {
       template: 'create/features/users/create-user.dto.ts.hbs',
-      output: 'src/modules/users/dto/create-user.dto.ts',
+      output: featurePath('users', 'dto', 'create-user.dto.ts'),
       when: (c) => c.usersModule,
     },
     {
       template: 'create/features/users/update-user.dto.ts.hbs',
-      output: 'src/modules/users/dto/update-user.dto.ts',
+      output: featurePath('users', 'dto', 'update-user.dto.ts'),
       when: (c) => c.usersModule,
     },
     {
       template: 'create/features/users/search-user.dto.ts.hbs',
-      output: 'src/modules/users/dto/search-user.dto.ts',
+      output: featurePath('users', 'dto', 'search-user.dto.ts'),
       when: (c) => c.usersModule && c.pagination,
     },
     {
       template: 'create/features/users/user-filter.query.ts.hbs',
-      output: 'src/modules/users/queries/user-filter.query.ts',
+      output: featurePath('users', 'queries', 'user-filter.query.ts'),
       when: (c) => c.usersModule && c.pagination,
     },
     {
       template: 'create/features/users/user-error-catalog.ts.hbs',
-      output: 'src/modules/users/user-error-catalog.ts',
+      output: featurePath('users', 'user-error-catalog.ts'),
       when: (c) => c.usersModule && c.responseEnvelope,
     },
     {
       template: 'create/features/users/user-swagger.decorator.ts.hbs',
-      output: 'src/modules/users/swagger/user-swagger.decorator.ts',
+      output: featurePath('users', 'swagger', 'user-swagger.decorator.ts'),
       when: (c) => c.usersModule && c.swagger,
     },
     {
       template: 'create/features/users/user-response.dto.ts.hbs',
-      output: 'src/modules/users/swagger/user-response.dto.ts',
+      output: featurePath('users', 'swagger', 'user-response.dto.ts'),
       when: (c) => c.usersModule && c.swagger,
     },
 
@@ -286,37 +295,45 @@ export function getCreateTemplateEntries(): TemplateEntry[] {
 export function getGenerateModuleEntries(
   config: ScaffoldConfig,
 ): TemplateEntry[] {
+  const modulePath = (
+    ctx: TemplateContext,
+    ...rest: string[]
+  ): string =>
+    moduleFeaturePath(
+      ctx.moduleVersioning,
+      ctx.moduleVersion,
+      ctx.name,
+      ...rest,
+    );
+
   const entries: TemplateEntry[] = [
     {
       template: 'generate/module/module.ts.hbs',
-      output: (ctx) => `src/modules/${ctx.name}/${ctx.fileBase}.module.ts`,
+      output: (ctx) => modulePath(ctx, `${ctx.fileBase}.module.ts`),
     },
     {
       template: 'generate/module/service.ts.hbs',
-      output: (ctx) => `src/modules/${ctx.name}/${ctx.fileBase}.service.ts`,
+      output: (ctx) => modulePath(ctx, `${ctx.fileBase}.service.ts`),
     },
     {
       template: 'generate/module/controller.ts.hbs',
-      output: (ctx) => `src/modules/${ctx.name}/${ctx.fileBase}.controller.ts`,
+      output: (ctx) => modulePath(ctx, `${ctx.fileBase}.controller.ts`),
     },
     {
       template: 'generate/module/service.spec.ts.hbs',
-      output: (ctx) => `src/modules/${ctx.name}/${ctx.fileBase}.service.spec.ts`,
+      output: (ctx) => modulePath(ctx, `${ctx.fileBase}.service.spec.ts`),
     },
     {
       template: 'generate/module/controller.spec.ts.hbs',
-      output: (ctx) =>
-        `src/modules/${ctx.name}/${ctx.fileBase}.controller.spec.ts`,
+      output: (ctx) => modulePath(ctx, `${ctx.fileBase}.controller.spec.ts`),
     },
     {
       template: 'generate/module/create.dto.ts.hbs',
-      output: (ctx) =>
-        `src/modules/${ctx.name}/dto/create-${ctx.entityFile}.dto.ts`,
+      output: (ctx) => modulePath(ctx, 'dto', `create-${ctx.entityFile}.dto.ts`),
     },
     {
       template: 'generate/module/update.dto.ts.hbs',
-      output: (ctx) =>
-        `src/modules/${ctx.name}/dto/update-${ctx.entityFile}.dto.ts`,
+      output: (ctx) => modulePath(ctx, 'dto', `update-${ctx.entityFile}.dto.ts`),
     },
   ];
 
@@ -324,7 +341,7 @@ export function getGenerateModuleEntries(
     entries.push({
       template: 'generate/module/entity.ts.hbs',
       output: (ctx) =>
-        `src/modules/${ctx.name}/entities/${ctx.entityFile}.entity.ts`,
+        modulePath(ctx, 'entities', `${ctx.entityFile}.entity.ts`),
     });
   }
 
@@ -333,12 +350,12 @@ export function getGenerateModuleEntries(
       {
         template: 'generate/module/search.dto.ts.hbs',
         output: (ctx) =>
-          `src/modules/${ctx.name}/dto/search-${ctx.entityFile}.dto.ts`,
+          modulePath(ctx, 'dto', `search-${ctx.entityFile}.dto.ts`),
       },
       {
         template: 'generate/module/filter.query.ts.hbs',
         output: (ctx) =>
-          `src/modules/${ctx.name}/queries/${ctx.entityFile}-filter.query.ts`,
+          modulePath(ctx, 'queries', `${ctx.entityFile}-filter.query.ts`),
       },
     );
   }
@@ -346,8 +363,7 @@ export function getGenerateModuleEntries(
   if (config.responseEnvelope) {
     entries.push({
       template: 'generate/module/error-catalog.ts.hbs',
-      output: (ctx) =>
-        `src/modules/${ctx.name}/${ctx.entityFile}-error-catalog.ts`,
+      output: (ctx) => modulePath(ctx, `${ctx.entityFile}-error-catalog.ts`),
     });
   }
 
@@ -356,12 +372,12 @@ export function getGenerateModuleEntries(
       {
         template: 'generate/module/swagger.decorator.ts.hbs',
         output: (ctx) =>
-          `src/modules/${ctx.name}/swagger/${ctx.entityFile}-swagger.decorator.ts`,
+          modulePath(ctx, 'swagger', `${ctx.entityFile}-swagger.decorator.ts`),
       },
       {
         template: 'generate/module/response.dto.ts.hbs',
         output: (ctx) =>
-          `src/modules/${ctx.name}/swagger/${ctx.entityFile}-response.dto.ts`,
+          modulePath(ctx, 'swagger', `${ctx.entityFile}-response.dto.ts`),
       },
     );
   }

@@ -3,8 +3,8 @@ import { ApiOperation } from '@nestjs/swagger';
 import {
   ApiConflictError,
   ApiDefaultErrors,
-} from '../../../common/swagger/decorators/api-error-responses.decorator';
-import { ApiSuccessResponse } from '../../../common/swagger/decorators/api-success-response.decorator';
+} from '{{commonFromNested}}/swagger/decorators/api-error-responses.decorator';
+import { ApiSuccessResponse } from '{{commonFromNested}}/swagger/decorators/api-success-response.decorator';
 import { AUTH_ERRORS } from '../auth-error-catalog';
 import { AuthTokenResponseDto } from './auth-response.dto';
 

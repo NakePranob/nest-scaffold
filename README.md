@@ -26,6 +26,7 @@ Interactive wizard lets you choose:
 - Database seeds
 - E2E scaffold
 - Architecture docs
+- **Module versioning** — place modules under `src/modules/v1/` (optional)
 
 ### Generate a module
 
@@ -35,6 +36,25 @@ nest-scaffold generate module orders
 ```
 
 Reads `nest-scaffold.config.json` (or auto-detects from the project).
+
+When the project uses versioned modules (`src/modules/v1/`, `v2/`, …), the CLI asks which version folder to use (or lets you create a new one).
+
+### Module layout
+
+**Flat (default):**
+
+```
+src/modules/auth/
+src/modules/users/
+```
+
+**Versioned (optional at create):**
+
+```
+src/modules/v1/auth/
+src/modules/v1/users/
+src/modules/v2/orders/   # generate can target v2 or create new version folders
+```
 
 ## Supported stack
 

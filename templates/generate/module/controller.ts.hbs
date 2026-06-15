@@ -21,7 +21,7 @@ import { Update{{entityName}}Dto } from './dto/update-{{entityFile}}.dto';
 import { Search{{entityName}}Dto } from './dto/search-{{entityFile}}.dto';
 {{/if}}
 {{#if hasAuth}}
-import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { JwtAuthGuard } from '{{commonFromModule}}/guards/jwt-auth.guard';
 {{/if}}
 {{#if hasSwagger}}
 import {

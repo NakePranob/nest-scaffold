@@ -9,12 +9,12 @@ import { Update{{entityName}}Dto } from './dto/update-{{entityFile}}.dto';
 {{#if hasPagination}}
 import { Search{{entityName}}Dto } from './dto/search-{{entityFile}}.dto';
 import { {{entityName}}FilterQuery } from './queries/{{entityFile}}-filter.query';
-import { PaginatedResult } from '../../common/interfaces/paginated-result.interface';
+import { PaginatedResult } from '{{commonFromModule}}/interfaces/paginated-result.interface';
 {{/if}}
 {{#if hasEnvelope}}
-import { AppException } from '../../common/helpers/app-exception';
+import { AppException } from '{{commonFromModule}}/helpers/app-exception';
 {{#if hasTypeorm}}
-import { isUniqueConstraintError } from '../../common/helpers/database-error';
+import { isUniqueConstraintError } from '{{commonFromModule}}/helpers/database-error';
 {{/if}}
 import { {{errorPrefix}}_ERRORS } from './{{entityFile}}-error-catalog';
 {{/if}}

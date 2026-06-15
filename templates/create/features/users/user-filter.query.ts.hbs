@@ -1,7 +1,7 @@
 import { SelectQueryBuilder } from 'typeorm';
 import { User } from '../entities/user.entity';
-import { PaginatedResult } from '../../../common/interfaces/paginated-result.interface';
-import { paginate } from '../../../common/helpers/pagination.helper';
+import { PaginatedResult } from '{{commonFromNested}}/interfaces/paginated-result.interface';
+import { paginate } from '{{commonFromNested}}/helpers/pagination.helper';
 
 export class UserFilterQuery {
   constructor(private qb: SelectQueryBuilder<User>) {}

@@ -69,9 +69,20 @@ export async function runCreateWizard(
     default: true,
   });
 
+  const moduleVersioning = await confirm({
+    message: 'Organize modules under a version folder (e.g. src/modules/v1)?',
+    default: false,
+  });
+
+  const defaultModuleVersion = moduleVersioning ? 'v1' : '';
+  const moduleVersions = moduleVersioning ? ['v1'] : [];
+
   const config = enforceDependencies({
     version: 1,
     projectName,
+    moduleVersioning,
+    defaultModuleVersion,
+    moduleVersions,
     swagger,
     docker,
     typeorm,
@@ -99,6 +110,9 @@ export async function runCreateWizard(
   console.log(`  Seeds: ${config.seeds ? 'yes' : 'no'}`);
   console.log(`  E2E: ${config.e2e ? 'yes' : 'no'}`);
   console.log(`  Docs: ${config.docs ? 'yes' : 'no'}`);
+  console.log(
+    `  Module versioning: ${config.moduleVersioning ? config.defaultModuleVersion : 'no'}`,
+  );
 
   const proceed = await select({
     message: 'Create project with these settings?',

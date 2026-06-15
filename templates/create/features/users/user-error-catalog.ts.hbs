@@ -1,5 +1,5 @@
 import { HttpStatus } from '@nestjs/common';
-import { ErrorDescriptor } from '../../common/errors/app-error-catalog';
+import { ErrorDescriptor } from '{{commonFromModule}}/errors/app-error-catalog';
 
 export enum UserErrorCode {
   UserNotFound = 'USER_NOT_FOUND',
