@@ -28,7 +28,15 @@ export interface ModuleNaming {
   errorPrefix: string;
 }
 
-export interface TemplateContext extends ScaffoldConfig, ModuleNaming {
+export interface StackVersionsContext {
+  stack: Record<string, string | number>;
+  stackLabel: string;
+}
+
+export interface TemplateContext
+  extends ScaffoldConfig,
+    ModuleNaming,
+    StackVersionsContext {
   hasAuth: boolean;
   hasSwagger: boolean;
   hasTypeorm: boolean;

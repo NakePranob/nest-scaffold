@@ -9,7 +9,7 @@ const program = new Command();
 program
   .name('nest-scaffold')
   .description('Scaffold NestJS modular backend projects')
-  .version('0.1.0');
+  .version('0.1.1');
 
 program
   .command('create')

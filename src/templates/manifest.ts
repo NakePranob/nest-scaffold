@@ -13,6 +13,7 @@ export function getCreateTemplateEntries(): TemplateEntry[] {
     { template: 'create/base/eslint.config.mjs.hbs', output: 'eslint.config.mjs', when: always },
     { template: 'create/base/.prettierrc.hbs', output: '.prettierrc', when: always },
     { template: 'create/base/.gitignore.hbs', output: '.gitignore', when: always },
+    { template: 'create/base/.npmrc.hbs', output: '.npmrc', when: always },
     { template: 'create/base/.env.example.hbs', output: '.env.example', when: always },
     { template: 'create/base/README.md.hbs', output: 'README.md', when: always },
 

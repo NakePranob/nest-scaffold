@@ -2,6 +2,7 @@ import path from 'node:path';
 import fs from 'fs-extra';
 import Handlebars from 'handlebars';
 import { ScaffoldConfig, TemplateContext, ModuleNaming } from '../types';
+import { STACK_LABEL, STACK_VERSIONS } from '../stack-versions';
 import { resolveModuleNaming } from './naming';
 
 Handlebars.registerHelper('eq', (a, b) => a === b);
@@ -20,6 +21,8 @@ export function buildTemplateContext(
   return {
     ...config,
     ...moduleNaming,
+    stack: { ...STACK_VERSIONS },
+    stackLabel: STACK_LABEL,
     hasAuth: config.auth,
     hasSwagger: config.swagger,
     hasTypeorm: config.typeorm,

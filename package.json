@@ -1,6 +1,6 @@
 {
   "name": "@nakedev/nest-scaffold",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Scaffold NestJS modular backend projects with selectable features",
   "bin": {
     "nest-scaffold": "./bin/nest-scaffold.js"
@@ -8,12 +8,15 @@
   "files": [
     "dist",
     "templates",
-    "bin"
+    "bin",
+    "stack-packages.json"
   ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "prepublishOnly": "pnpm run build"
+    "prepublishOnly": "pnpm run build",
+    "test:smoke": "node scripts/smoke-test.mjs",
+    "check:stack": "node scripts/check-stack-updates.mjs"
   },
   "keywords": [
     "nestjs",
