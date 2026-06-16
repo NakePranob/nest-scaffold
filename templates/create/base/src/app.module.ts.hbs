@@ -3,8 +3,10 @@ import { ConfigModule{{#if hasTypeorm}}, ConfigService{{/if}} } from '@nestjs/co
 {{#if hasTypeorm}}
 import { TypeOrmModule } from '@nestjs/typeorm';
 {{/if}}
+{{#if isMonolith}}
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+{{/if}}
 {{#if hasAuth}}
 import { AuthModule } from '{{modulesImportPrefix}}/auth/auth.module';
 {{/if}}
@@ -37,8 +39,8 @@ import { UsersModule } from '{{modulesImportPrefix}}/users/users.module';
 {{#if hasUsersModule}}
     UsersModule,
 {{/if}}
-  ],
+  ],{{#if isMonolith}}
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService],{{/if}}
 })
 export class AppModule {}

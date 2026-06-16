@@ -1,0 +1,14 @@
+import { Controller } from '@nestjs/common';
+{{#if hasService}}
+import { GrpcMethod } from '@nestjs/microservices';
+import { {{pascalName}}Service } from './{{fileBase}}.service';
+{{/if}}
+
+@Controller()
+export class {{pascalName}}Controller {
+  {{#if hasService}}
+  constructor(private readonly {{camelName}}Service: {{pascalName}}Service) {}
+  {{else}}
+  constructor() {}
+  {{/if}}
+}

@@ -1,8 +1,11 @@
 import type { ModulePathContext } from './utils/module-paths';
 
+export type Architecture = 'monolith' | 'microservice';
+
 export interface ScaffoldConfig {
   version: 1;
   projectName: string;
+  architecture: Architecture;
   moduleVersioning: boolean;
   defaultModuleVersion: string;
   moduleVersions: string[];
@@ -51,6 +54,8 @@ export interface TemplateContext
   hasUsersModule: boolean;
   hasService: boolean;
   hasController: boolean;
+  isMonolith: boolean;
+  isMicroservice: boolean;
 }
 
 export type { ModulePathContext };

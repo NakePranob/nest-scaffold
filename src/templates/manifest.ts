@@ -26,12 +26,22 @@ export function getCreateTemplateEntries(): TemplateEntry[] {
     { template: 'create/base/.env.example.hbs', output: '.env.example', when: always },
     { template: 'create/base/README.md.hbs', output: 'README.md', when: always },
 
-    // App source
+    // App source (shared)
     { template: 'create/base/src/main.ts.hbs', output: 'src/main.ts', when: always },
     { template: 'create/base/src/app.module.ts.hbs', output: 'src/app.module.ts', when: always },
-    { template: 'create/base/src/app.controller.ts.hbs', output: 'src/app.controller.ts', when: always },
-    { template: 'create/base/src/app.service.ts.hbs', output: 'src/app.service.ts', when: always },
-    { template: 'create/base/src/app.controller.spec.ts.hbs', output: 'src/app.controller.spec.ts', when: always },
+
+    // Monolith app source
+    { template: 'create/base/src/monolith/app.controller.ts.hbs', output: 'src/app.controller.ts', when: (c) => c.architecture === 'monolith' },
+    { template: 'create/base/src/monolith/app.service.ts.hbs', output: 'src/app.service.ts', when: (c) => c.architecture === 'monolith' },
+    { template: 'create/base/src/monolith/app.controller.spec.ts.hbs', output: 'src/app.controller.spec.ts', when: (c) => c.architecture === 'monolith' },
+
+    // Microservice app source
+    { template: 'create/base/src/microservice/health.controller.ts.hbs', output: 'src/health.controller.ts', when: (c) => c.architecture === 'microservice' },
+    {
+      template: 'create/base/src/microservice/proto.hbs',
+      output: (ctx) => `src/proto/${ctx.projectName}.proto`,
+      when: (c) => c.architecture === 'microservice',
+    },
 
     // Envelope
     {
@@ -138,9 +148,17 @@ export function getCreateTemplateEntries(): TemplateEntry[] {
       when: (c) => c.auth,
     },
     {
-      template: 'create/features/auth/auth.controller.ts.hbs',
-      output: featurePath('auth', 'auth.controller.ts'),
+      template: (c) =>
+        c.architecture === 'microservice'
+          ? 'create/features/auth/auth.controller.grpc.ts.hbs'
+          : 'create/features/auth/auth.controller.ts.hbs',
+      output: (ctx) => featurePath('auth', `auth.controller${ctx.isMicroservice ? '.grpc' : ''}.ts`)(ctx),
       when: (c) => c.auth,
+    },
+    {
+      template: 'create/features/auth/auth.proto.hbs',
+      output: featurePath('auth', 'proto', 'auth.proto'),
+      when: (c) => c.auth && c.architecture === 'microservice',
     },
     {
       template: 'create/features/auth/auth.service.ts.hbs',
@@ -190,9 +208,17 @@ export function getCreateTemplateEntries(): TemplateEntry[] {
       when: (c) => c.usersModule,
     },
     {
-      template: 'create/features/users/users.controller.ts.hbs',
-      output: featurePath('users', 'users.controller.ts'),
+      template: (c) =>
+        c.architecture === 'microservice'
+          ? 'create/features/users/users.controller.grpc.ts.hbs'
+          : 'create/features/users/users.controller.ts.hbs',
+      output: (ctx) => featurePath('users', `users.controller${ctx.isMicroservice ? '.grpc' : ''}.ts`)(ctx),
       when: (c) => c.usersModule,
+    },
+    {
+      template: 'create/features/users/users.proto.hbs',
+      output: featurePath('users', 'proto', 'users.proto'),
+      when: (c) => c.usersModule && c.architecture === 'microservice',
     },
     {
       template: 'create/features/users/users.service.ts.hbs',
@@ -327,6 +353,8 @@ export function getGenerateModuleEntries(
     },
   ];
 
+  const isMicroservice = config.architecture === 'microservice';
+
   if (isFull) {
     entries.push(
       {
@@ -334,17 +362,22 @@ export function getGenerateModuleEntries(
         output: (ctx) => modulePath(ctx, `${ctx.fileBase}.service.ts`),
       },
       {
-        template: 'generate/module/controller.ts.hbs',
-        output: (ctx) => modulePath(ctx, `${ctx.fileBase}.controller.ts`),
+        template: isMicroservice
+          ? 'generate/module/controller.grpc.ts.hbs'
+          : 'generate/module/controller.ts.hbs',
+        output: (ctx) => modulePath(ctx, `${ctx.fileBase}.controller${isMicroservice ? '.grpc' : ''}.ts`),
       },
       {
         template: 'generate/module/service.spec.ts.hbs',
         output: (ctx) => modulePath(ctx, `${ctx.fileBase}.service.spec.ts`),
       },
-      {
-        template: 'generate/module/controller.spec.ts.hbs',
-        output: (ctx) => modulePath(ctx, `${ctx.fileBase}.controller.spec.ts`),
-      },
+      ...(isMicroservice
+        ? []
+        : [{
+            template: 'generate/module/controller.spec.ts.hbs',
+            output: (ctx: TemplateContext) => modulePath(ctx, `${ctx.fileBase}.controller.spec.ts`),
+          }]
+      ),
       {
         template: 'generate/module/create.dto.ts.hbs',
         output: (ctx) => modulePath(ctx, 'dto', `create-${ctx.entityFile}.dto.ts`),
@@ -354,6 +387,13 @@ export function getGenerateModuleEntries(
         output: (ctx) => modulePath(ctx, 'dto', `update-${ctx.entityFile}.dto.ts`),
       },
     );
+
+    if (isMicroservice) {
+      entries.push({
+        template: 'generate/controller/module.proto.hbs',
+        output: (ctx) => modulePath(ctx, 'proto', `${ctx.fileBase}.proto`),
+      });
+    }
 
     if (config.pagination) {
       entries.push(

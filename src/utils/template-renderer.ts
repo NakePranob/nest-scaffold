@@ -58,6 +58,8 @@ export function buildTemplateContext(
     hasUsersModule: config.usersModule,
     hasService: options?.hasService ?? true,
     hasController: options?.hasController ?? true,
+    isMonolith: config.architecture === 'monolith',
+    isMicroservice: config.architecture === 'microservice',
   };
 }
 
@@ -82,7 +84,7 @@ export async function writeRenderedTemplate(
 }
 
 export interface TemplateEntry {
-  template: string;
+  template: string | ((config: ScaffoldConfig) => string);
   output: string | ((context: TemplateContext) => string);
   when?: (config: ScaffoldConfig) => boolean;
 }
@@ -102,7 +104,12 @@ export async function applyTemplateEntries(
         ? entry.output(context)
         : entry.output;
 
+    const templatePath =
+      typeof entry.template === 'function'
+        ? entry.template(context)
+        : entry.template;
+
     const outputPath = path.join(projectRoot, relativeOutput);
-    await writeRenderedTemplate(entry.template, outputPath, context);
+    await writeRenderedTemplate(templatePath, outputPath, context);
   }
 }

@@ -4,7 +4,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { {{entityName}} } from './entities/{{entityFile}}.entity';
 {{/if}}
 {{#if hasController}}
-import { {{pascalName}}Controller } from './{{fileBase}}.controller';
+import { {{pascalName}}Controller } from './{{fileBase}}.controller{{#if isMicroservice}}.grpc{{/if}}';
 {{/if}}
 {{#if hasService}}
 import { {{pascalName}}Service } from './{{fileBase}}.service';

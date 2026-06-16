@@ -20,6 +20,7 @@ export async function readConfig(
   return {
     version: 1,
     projectName: raw.projectName ?? path.basename(projectRoot),
+    architecture: raw.architecture ?? 'monolith',
     moduleVersioning: raw.moduleVersioning ?? false,
     defaultModuleVersion: raw.defaultModuleVersion ?? '',
     moduleVersions: raw.moduleVersions ?? [],
@@ -56,6 +57,10 @@ export function enforceDependencies(
   next.pagination = true;
   next.orm = 'typeorm';
   next.database = 'postgres';
+
+  if (next.architecture === 'microservice') {
+    next.swagger = false;
+  }
 
   if (!next.usersModule) {
     next.auth = false;

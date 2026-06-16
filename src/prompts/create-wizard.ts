@@ -1,20 +1,33 @@
-import { confirm, input, select } from '@inquirer/prompts';
-import { ScaffoldConfig } from '../types';
+import { confirm, input, select, Separator } from '@inquirer/prompts';
+import { Architecture, ScaffoldConfig } from '../types';
 import { enforceDependencies } from '../utils/config';
 
 interface WizardStep {
   key: string;
   message: string;
   default: boolean;
-  when: (answers: Record<string, boolean>) => boolean;
+  when: (answers: Record<string, boolean>, architecture: Architecture) => boolean;
 }
+
+const ARCHITECTURE_CHOICES: { name: string; value: Architecture; description: string }[] = [
+  {
+    name: 'Monolith (HTTP REST)',
+    value: 'monolith',
+    description: 'Traditional HTTP server with Fastify',
+  },
+  {
+    name: 'Microservice (gRPC)',
+    value: 'microservice',
+    description: 'gRPC microservice with @nestjs/microservices',
+  },
+];
 
 const STEPS: WizardStep[] = [
   {
     key: 'swagger',
     message: 'Include Swagger API documentation?',
     default: true,
-    when: () => true,
+    when: (_, arch) => arch === 'monolith',
   },
   {
     key: 'usersModule',
@@ -65,9 +78,17 @@ export async function runCreateWizard(
 ): Promise<ScaffoldConfig> {
   console.log('\nConfigure your NestJS project:\n');
 
+  const architecture = await select<Architecture>({
+    message: 'Architecture type:',
+    choices: ARCHITECTURE_CHOICES,
+    default: 'monolith',
+  });
+
+  console.log(`  Selected: ${architecture === 'monolith' ? 'Monolith (HTTP REST)' : 'Microservice (gRPC)'}\n`);
+
   const answers: Record<string, boolean> = {};
   for (const step of STEPS) {
-    if (!step.when(answers)) continue;
+    if (!step.when(answers, architecture)) continue;
     answers[step.key] = await confirm({
       message: step.message,
       default: step.default,
@@ -77,6 +98,7 @@ export async function runCreateWizard(
   const config = enforceDependencies({
     version: 1,
     projectName,
+    architecture,
     moduleVersioning: answers.moduleVersioning,
     defaultModuleVersion: answers.moduleVersioning ? 'v1' : '',
     moduleVersions: answers.moduleVersioning ? ['v1'] : [],
@@ -95,8 +117,13 @@ export async function runCreateWizard(
     database: 'postgres',
   });
 
+  const archLabel = config.architecture === 'monolith' ? 'Monolith (HTTP)' : 'Microservice (gRPC)';
+
   console.log('\nSummary:');
-  console.log(`  Swagger: ${config.swagger ? 'yes' : 'no'}`);
+  console.log(`  Architecture: ${archLabel}`);
+  if (config.architecture === 'monolith') {
+    console.log(`  Swagger: ${config.swagger ? 'yes' : 'no'}`);
+  }
   console.log(`  Users module: ${config.usersModule ? 'yes' : 'no'}`);
   console.log(`  Auth: ${config.auth ? 'yes' : 'no'}`);
   console.log(`  Seeds: ${config.seeds ? 'yes' : 'no'}`);

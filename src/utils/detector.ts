@@ -1,6 +1,6 @@
 import path from 'node:path';
 import fs from 'fs-extra';
-import { ScaffoldConfig } from '../types';
+import { Architecture, ScaffoldConfig } from '../types';
 import {
   detectModuleVersioning,
   listModuleVersions,
@@ -72,7 +72,11 @@ export async function detectConfig(
 
   const packageJson = (await fs.readJson(
     path.join(projectRoot, 'package.json'),
-  )) as { name?: string };
+  )) as { name?: string; dependencies?: Record<string, string> };
+
+  const deps = { ...packageJson.dependencies };
+  const hasMicroservice = deps['@nestjs/microservices'] !== undefined;
+  const architecture: Architecture = hasMicroservice ? 'microservice' : 'monolith';
 
   const moduleVersions =
     versioning.moduleVersions.length > 0
@@ -82,6 +86,7 @@ export async function detectConfig(
   return {
     version: 1,
     projectName: packageJson.name ?? path.basename(projectRoot),
+    architecture,
     moduleVersioning: versioning.moduleVersioning,
     defaultModuleVersion: versioning.defaultModuleVersion,
     moduleVersions,

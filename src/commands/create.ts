@@ -54,9 +54,14 @@ export async function createCommand(
   }
   console.log('  cp .env.example .env');
   console.log('  pnpm install');
-  console.log('  pnpm run start:dev');
-  if (config.swagger) {
-    console.log('\n  Swagger: http://localhost:3000/api');
+  if (config.architecture === 'microservice') {
+    console.log('  pnpm run start:dev');
+    console.log('\n  gRPC server: 0.0.0.0:50051');
+  } else {
+    console.log('  pnpm run start:dev');
+    if (config.swagger) {
+      console.log('\n  Swagger: http://localhost:3000/api');
+    }
   }
   console.log('');
 }
@@ -65,6 +70,7 @@ function getDefaultConfig(projectName: string): ScaffoldConfig {
   return enforceDependencies({
     version: 1,
     projectName,
+    architecture: 'monolith',
     moduleVersioning: false,
     defaultModuleVersion: '',
     moduleVersions: [],

@@ -1,0 +1,38 @@
+import { Controller } from '@nestjs/common';
+import { GrpcMethod } from '@nestjs/microservices';
+import { UsersService } from './users.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+{{#if hasPagination}}
+import { SearchUserDto } from './dto/search-user.dto';
+{{/if}}
+
+@Controller()
+export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
+
+  @GrpcMethod('UsersService', 'Create')
+  create(dto: CreateUserDto) {
+    return this.usersService.create(dto);
+  }
+
+  @GrpcMethod('UsersService', 'FindAll')
+  findAll(dto: {{#if hasPagination}}SearchUserDto{{else}}Record<string, never>{{/if}}) {
+    return this.usersService.findAll(dto);
+  }
+
+  @GrpcMethod('UsersService', 'FindById')
+  findById(dto: { id: string }) {
+    return this.usersService.findById(dto.id);
+  }
+
+  @GrpcMethod('UsersService', 'Update')
+  update(dto: { id: string; data: UpdateUserDto }) {
+    return this.usersService.update(dto.id, dto.data);
+  }
+
+  @GrpcMethod('UsersService', 'Delete')
+  delete(dto: { id: string }) {
+    return this.usersService.delete(dto.id);
+  }
+}

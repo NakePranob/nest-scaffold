@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package {{name}};
+
+service {{pascalName}}Service {
+  rpc Create (Create{{entityName}}Request) returns ({{entityName}}Response);
+  rpc FindAll (Empty) returns (FindAll{{entityName}}Response);
+  rpc FindById (IdRequest) returns ({{entityName}}Response);
+  rpc Update (Update{{entityName}}Request) returns ({{entityName}}Response);
+  rpc Delete (IdRequest) returns (Empty);
+}
+
+message Empty {}
+
+message IdRequest {
+  string id = 1;
+}
+
+message Create{{entityName}}Request {
+  // Add your fields here
+}
+
+message Update{{entityName}}Request {
+  string id = 1;
+  // Add your fields here
+}
+
+message {{entityName}}Response {
+  string id = 1;
+  // Add your response fields here
+}
+
+message FindAll{{entityName}}Response {
+  repeated {{entityName}}Response items = 1;
+}

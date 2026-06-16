@@ -1,0 +1,50 @@
+syntax = "proto3";
+
+package users;
+
+service UsersService {
+  rpc Create (CreateUserRequest) returns (UserResponse);
+  rpc FindAll (FindAllUsersRequest) returns (FindAllUsersResponse);
+  rpc FindById (IdRequest) returns (UserResponse);
+  rpc Update (UpdateUserRequest) returns (UserResponse);
+  rpc Delete (IdRequest) returns (Empty);
+}
+
+message Empty {}
+
+message IdRequest {
+  string id = 1;
+}
+
+message CreateUserRequest {
+  string email = 1;
+  string name = 2;
+  string password = 3;
+}
+
+message UpdateUserRequest {
+  string id = 1;
+  string email = 2;
+  string name = 3;
+}
+
+message FindAllUsersRequest {
+  int32 page = 1;
+  int32 limit = 2;
+  string search = 3;
+}
+
+message UserResponse {
+  string id = 1;
+  string email = 2;
+  string name = 3;
+  string createdAt = 4;
+  string updatedAt = 5;
+}
+
+message FindAllUsersResponse {
+  repeated UserResponse items = 1;
+  int32 total = 2;
+  int32 page = 3;
+  int32 limit = 4;
+}

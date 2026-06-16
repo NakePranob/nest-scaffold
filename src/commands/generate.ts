@@ -132,7 +132,8 @@ export async function generateControllerCommand(
     moduleFeaturePath(config.moduleVersioning, moduleVersion, naming.name),
   );
 
-  const controllerPath = path.join(moduleDir, `${naming.fileBase}.controller.ts`);
+  const controllerSuffix = config.architecture === 'microservice' ? '.grpc' : '';
+  const controllerPath = path.join(moduleDir, `${naming.fileBase}.controller${controllerSuffix}.ts`);
   const servicePath = path.join(moduleDir, `${naming.fileBase}.service.ts`);
   const modulePath2 = path.join(moduleDir, `${naming.fileBase}.module.ts`);
 
@@ -173,10 +174,26 @@ export async function generateControllerCommand(
     await fs.ensureDir(moduleDir);
   }
 
+  const controllerTemplate = config.architecture === 'microservice'
+    ? 'generate/controller/controller.grpc.ts.hbs'
+    : 'generate/controller/controller.ts.hbs';
+
   await fs.writeFile(controllerPath, await renderTemplateFile(
-    path.join(getTemplatesRoot(), 'generate/controller/controller.ts.hbs'),
+    path.join(getTemplatesRoot(), controllerTemplate),
     context,
   ));
+
+  if (config.architecture === 'microservice') {
+    const protoDir = path.join(moduleDir, 'proto');
+    await fs.ensureDir(protoDir);
+    const protoPath = path.join(protoDir, `${naming.fileBase}.proto`);
+    if (!(await fs.pathExists(protoPath))) {
+      await fs.writeFile(protoPath, await renderTemplateFile(
+        path.join(getTemplatesRoot(), 'generate/controller/module.proto.hbs'),
+        context,
+      ));
+    }
+  }
 
   console.log(pc.green(`\n✓ Controller "${versionLabel}${naming.name}" generated successfully!\n`));
 }
