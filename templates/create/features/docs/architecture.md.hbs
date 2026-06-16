@@ -5,8 +5,8 @@
 
 ## 1. Architecture Topology
 
-**Decision:** Backend-only monolith
-**Rationale:** This CLI scaffolds a single NestJS application that keeps all feature modules inside one service
+**Decision:** {{#if isMicroservice}}Backend microservice over gRPC{{else}}Backend-only monolith{{/if}}
+**Rationale:** {{#if isMicroservice}}This CLI scaffolds a standalone NestJS microservice that communicates via gRPC protocol{{else}}This CLI scaffolds a single NestJS application that keeps all feature modules inside one service{{/if}}
 
 ## 2. Module Layout
 
@@ -19,7 +19,9 @@ src/
 {{#if moduleVersioning}}├── modules/{{defaultModuleVersion}}/<feature>/
 {{else}}├── modules/<feature>/
 {{/if}}├── app.module.ts
-└── main.ts
+{{#if isMonolith}}├── app.controller.ts
+├── app.service.ts
+{{/if}}└── main.ts
 ```
 
 - `common/` stores shared cross-cutting concerns
@@ -28,8 +30,13 @@ src/
 
 ## 3. API Style
 
+{{#if isMicroservice}}
+**Decision:** gRPC over `@nestjs/microservices`
+**Rationale:** The scaffold generates gRPC controllers with `@GrpcMethod()` and `.proto` definitions as the primary contract
+{{else}}
 **Decision:** REST over Fastify
 **Rationale:** The scaffold uses `@nestjs/platform-fastify` as the primary HTTP adapter and generates controllers for REST endpoints
+{{/if}}
 
 ## 4. Response and Error Model
 

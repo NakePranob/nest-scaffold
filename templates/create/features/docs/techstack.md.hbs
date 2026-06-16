@@ -10,8 +10,9 @@
 | Language | TypeScript `{{stack.typescript}}` |
 | Runtime target | Node.js >= 20 |
 | Framework | NestJS `{{stack.nestCommon}}` |
-| HTTP Adapter | Fastify (`@nestjs/platform-fastify` `{{stack.nestPlatformFastify}}`) |
-| Database | PostgreSQL |
+{{#if isMonolith}}| HTTP Adapter | Fastify (`@nestjs/platform-fastify` `{{stack.nestPlatformFastify}}`) |
+{{/if}}{{#if isMicroservice}}| Transport | gRPC (`@nestjs/microservices` `{{stack.nestMicroservices}}`, `@grpc/grpc-js` `{{stack.grpcJs}}`) |
+{{/if}}| Database | PostgreSQL |
 | ORM | TypeORM (`@nestjs/typeorm` `{{stack.nestTypeorm}}`) |
 {{#if auth}}| Auth | JWT + Passport (`@nestjs/jwt` `{{stack.nestJwt}}`, `@nestjs/passport` `{{stack.nestPassport}}`) |{{/if}}
 {{#if swagger}}| API Docs | Swagger (`@nestjs/swagger` `{{stack.nestSwagger}}`) |{{/if}}
@@ -23,9 +24,10 @@
 - Response envelope: `always enabled by the CLI`
 - Pagination helpers: `always enabled by the CLI`
 - TypeORM + PostgreSQL baseline: `always enabled by the CLI`
-- Example Users module: `{{#if usersModule}}enabled{{else}}disabled{{/if}}`
+- Architecture: `{{#if isMicroservice}}microservice (gRPC){{else}}monolith (HTTP){{/if}}`
+{{#if isMonolith}}- Example Users module: `{{#if usersModule}}enabled{{else}}disabled{{/if}}`
 - Auth module: `{{#if auth}}enabled{{else}}disabled{{/if}}`
-- Swagger docs: `{{#if swagger}}enabled{{else}}disabled{{/if}}`
+- Swagger docs: `{{#if swagger}}enabled{{else}}disabled{{/if}}`{{/if}}
 - Docker setup: `{{#if docker}}enabled{{else}}disabled{{/if}}`
 - E2E scaffold: `{{#if e2e}}enabled{{else}}disabled{{/if}}`
 - Module versioning: `{{#if moduleVersioning}}enabled (default: `{{defaultModuleVersion}}`){{else}}disabled{{/if}}`
@@ -36,8 +38,11 @@
 |---------|---------|---------|
 | `@nestjs/common` | `{{stack.nestCommon}}` | Core Nest decorators and providers |
 | `@nestjs/core` | `{{stack.nestCore}}` | Nest runtime |
-| `@nestjs/platform-fastify` | `{{stack.nestPlatformFastify}}` | Fastify HTTP adapter |
-{{#if swagger}}| `@nestjs/swagger` | `{{stack.nestSwagger}}` | OpenAPI document generation |
+{{#if isMonolith}}| `@nestjs/platform-fastify` | `{{stack.nestPlatformFastify}}` | Fastify HTTP adapter |
+{{/if}}{{#if isMicroservice}}| `@nestjs/microservices` | `{{stack.nestMicroservices}}` | gRPC transport |
+| `@grpc/grpc-js` | `{{stack.grpcJs}}` | gRPC implementation |
+| `@grpc/proto-loader` | `{{stack.grpcProtoLoader}}` | Proto file loader |
+{{/if}}{{#if swagger}}| `@nestjs/swagger` | `{{stack.nestSwagger}}` | OpenAPI document generation |
 {{/if}}| `@nestjs/typeorm` | `{{stack.nestTypeorm}}` | Nest integration for TypeORM |
 | `pg` | `{{stack.pg}}` | PostgreSQL driver |
 {{#if auth}}| `@nestjs/jwt` | `{{stack.nestJwt}}` | JWT token issuing/verification |

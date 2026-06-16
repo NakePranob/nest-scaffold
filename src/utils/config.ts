@@ -60,6 +60,9 @@ export function enforceDependencies(
 
   if (next.architecture === 'microservice') {
     next.swagger = false;
+    next.usersModule = false;
+    next.auth = false;
+    next.seeds = false;
   }
 
   if (!next.usersModule) {
