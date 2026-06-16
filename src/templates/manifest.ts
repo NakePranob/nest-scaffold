@@ -287,6 +287,11 @@ export function getCreateTemplateEntries(): TemplateEntry[] {
       output: 'docs/architect/techstack.md',
       when: (c) => c.docs,
     },
+    {
+      template: 'create/features/docs/architecture.md.hbs',
+      output: 'docs/architect/architecture.md',
+      when: (c) => c.docs,
+    },
 
     // Config file
     {

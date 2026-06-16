@@ -67,7 +67,7 @@ export async function detectConfig(
     path.join(projectRoot, 'test', 'jest-e2e.json'),
   );
   const hasDocs = await fs.pathExists(
-    path.join(projectRoot, 'docs', 'architect', 'patterns.md'),
+    path.join(projectRoot, 'docs', 'architect'),
   );
 
   const packageJson = (await fs.readJson(

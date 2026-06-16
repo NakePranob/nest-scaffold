@@ -17,11 +17,20 @@ function run(command, cwd = workDir) {
 }
 
 try {
-  if (!fs.existsSync(path.join(cliRoot, 'dist', 'index.js'))) {
+  if (!fs.existsSync(path.join(cliRoot, 'dist', 'src', 'index.js'))) {
     run('pnpm run build', cliRoot);
   }
 
   run(`node "${cliBin}" create smoke-app --defaults`);
+  for (const docFile of [
+    'docs/architect/patterns.md',
+    'docs/architect/techstack.md',
+    'docs/architect/architecture.md',
+  ]) {
+    if (!fs.existsSync(path.join(projectDir, docFile))) {
+      throw new Error(`Missing generated doc: ${docFile}`);
+    }
+  }
   run('pnpm install --ignore-scripts', projectDir);
   run('pnpm exec nest build', projectDir);
   run(`node "${cliBin}" generate module orders --full`, projectDir);

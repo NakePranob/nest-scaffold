@@ -1,4 +1,5 @@
 import path from 'node:path';
+import nodeFs from 'node:fs';
 import fs from 'fs-extra';
 import Handlebars from 'handlebars';
 import { ScaffoldConfig, TemplateContext, ModuleNaming } from '../types';
@@ -10,7 +11,19 @@ Handlebars.registerHelper('eq', (a, b) => a === b);
 Handlebars.registerHelper('json', (value) => JSON.stringify(value));
 
 export function getTemplatesRoot(): string {
-  return path.join(__dirname, '..', '..', 'templates');
+  const candidates = [
+    path.join(__dirname, '..', '..', 'templates'),
+    path.join(__dirname, '..', '..', '..', 'templates'),
+  ];
+
+  const resolved = candidates.find((candidate) =>
+    nodeFs.existsSync(path.join(candidate, 'create', 'base', 'package.json.hbs')),
+  );
+  if (!resolved) {
+    throw new Error('Unable to locate templates directory');
+  }
+
+  return resolved;
 }
 
 export function buildTemplateContext(
