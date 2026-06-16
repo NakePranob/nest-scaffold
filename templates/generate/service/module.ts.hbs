@@ -1,8 +1,0 @@
-import { Module } from '@nestjs/common';
-import { {{pascalName}}Service } from './{{fileBase}}.service';
-
-@Module({
-  providers: [{{pascalName}}Service],
-  exports: [{{pascalName}}Service],
-})
-export class {{moduleClass}} {}

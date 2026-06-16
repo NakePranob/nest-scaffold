@@ -1,5 +1,5 @@
 import { TemplateEntry } from '../utils/template-renderer';
-import { ScaffoldConfig, TemplateContext } from '../types';
+import { TemplateContext } from '../types';
 import { moduleFeaturePath } from '../utils/module-paths';
 
 const always = () => true;
@@ -38,83 +38,110 @@ export function getCreateTemplateEntries(): TemplateEntry[] {
     // Microservice app source
     { template: 'create/base/src/microservice/health.controller.ts.hbs', output: 'src/health.controller.ts', when: (c) => c.architecture === 'microservice' },
     {
+      template: 'create/base/src/microservice/grpc.options.ts.hbs',
+      output: 'src/grpc/grpc.options.ts',
+      when: (c) => c.architecture === 'microservice',
+    },
+    {
       template: 'create/base/src/microservice/proto.hbs',
       output: (ctx) => `src/proto/${ctx.projectName}.proto`,
       when: (c) => c.architecture === 'microservice',
     },
 
-    // Envelope
+    // Monolith — HTTP response envelope
     {
-      template: 'create/features/envelope/response.interceptor.ts.hbs',
+      template: 'create/features/monolith/envelope/response.interceptor.ts.hbs',
       output: 'src/common/interceptors/response.interceptor.ts',
-      when: (c) => c.responseEnvelope,
+      when: (c) => c.responseEnvelope && c.architecture === 'monolith',
     },
     {
-      template: 'create/features/envelope/all-exceptions.filter.ts.hbs',
+      template: 'create/features/monolith/envelope/all-exceptions.filter.ts.hbs',
       output: 'src/common/filters/all-exceptions.filter.ts',
-      when: (c) => c.responseEnvelope,
+      when: (c) => c.responseEnvelope && c.architecture === 'monolith',
     },
     {
-      template: 'create/features/envelope/app-exception.ts.hbs',
+      template: 'create/features/monolith/envelope/app-exception.ts.hbs',
       output: 'src/common/helpers/app-exception.ts',
-      when: (c) => c.responseEnvelope,
+      when: (c) => c.responseEnvelope && c.architecture === 'monolith',
     },
     {
-      template: 'create/features/envelope/app-error-catalog.ts.hbs',
+      template: 'create/features/monolith/envelope/app-error-catalog.ts.hbs',
       output: 'src/common/errors/app-error-catalog.ts',
-      when: (c) => c.responseEnvelope,
+      when: (c) => c.responseEnvelope && c.architecture === 'monolith',
     },
     {
-      template: 'create/features/envelope/validation.pipe.ts.hbs',
+      template: 'create/features/monolith/envelope/validation.pipe.ts.hbs',
       output: 'src/common/pipes/validation.pipe.ts',
-      when: (c) => c.responseEnvelope,
+      when: (c) => c.responseEnvelope && c.architecture === 'monolith',
     },
 
-    // Pagination
+    // Microservice — RPC common
     {
-      template: 'create/features/pagination/pagination.dto.ts.hbs',
+      template: 'create/features/microservice/rpc-common/rpc-error-catalog.ts.hbs',
+      output: 'src/common/errors/rpc-error-catalog.ts',
+      when: (c) => c.architecture === 'microservice',
+    },
+    {
+      template: 'create/features/microservice/rpc-common/rpc-exception.ts.hbs',
+      output: 'src/common/helpers/rpc-exception.ts',
+      when: (c) => c.architecture === 'microservice',
+    },
+    {
+      template: 'create/features/microservice/rpc-common/rpc-validation.pipe.ts.hbs',
+      output: 'src/common/pipes/rpc-validation.pipe.ts',
+      when: (c) => c.architecture === 'microservice',
+    },
+    {
+      template: 'create/features/microservice/rpc-common/rpc-exception.filter.ts.hbs',
+      output: 'src/common/filters/rpc-exception.filter.ts',
+      when: (c) => c.architecture === 'microservice',
+    },
+
+    // Monolith — Pagination
+    {
+      template: 'create/features/monolith/pagination/pagination.dto.ts.hbs',
       output: 'src/common/dto/pagination.dto.ts',
       when: (c) => c.pagination,
     },
     {
-      template: 'create/features/pagination/paginated-result.interface.ts.hbs',
+      template: 'create/features/monolith/pagination/paginated-result.interface.ts.hbs',
       output: 'src/common/interfaces/paginated-result.interface.ts',
       when: (c) => c.pagination,
     },
     {
-      template: 'create/features/pagination/pagination.helper.ts.hbs',
+      template: 'create/features/monolith/pagination/pagination.helper.ts.hbs',
       output: 'src/common/helpers/pagination.helper.ts',
       when: (c) => c.pagination,
     },
     {
-      template: 'create/features/pagination/base-filter.query.ts.hbs',
+      template: 'create/features/monolith/pagination/base-filter.query.ts.hbs',
       output: 'src/common/helpers/base-filter.query.ts',
       when: (c) => c.pagination,
     },
 
-    // Swagger
+    // Monolith — Swagger
     {
-      template: 'create/features/swagger/setup-swagger.ts.hbs',
+      template: 'create/features/monolith/swagger/setup-swagger.ts.hbs',
       output: 'src/common/swagger/setup-swagger.ts',
       when: (c) => c.swagger,
     },
     {
-      template: 'create/features/swagger/api-success-response.decorator.ts.hbs',
+      template: 'create/features/monolith/swagger/api-success-response.decorator.ts.hbs',
       output: 'src/common/swagger/decorators/api-success-response.decorator.ts',
       when: (c) => c.swagger && c.responseEnvelope,
     },
     {
-      template: 'create/features/swagger/api-error-responses.decorator.ts.hbs',
+      template: 'create/features/monolith/swagger/api-error-responses.decorator.ts.hbs',
       output: 'src/common/swagger/decorators/api-error-responses.decorator.ts',
       when: (c) => c.swagger && c.responseEnvelope,
     },
     {
-      template: 'create/features/swagger/success-response.dto.ts.hbs',
+      template: 'create/features/monolith/swagger/success-response.dto.ts.hbs',
       output: 'src/common/swagger/dto/success-response.dto.ts',
       when: (c) => c.swagger && c.responseEnvelope,
     },
     {
-      template: 'create/features/swagger/error-response.dto.ts.hbs',
+      template: 'create/features/monolith/swagger/error-response.dto.ts.hbs',
       output: 'src/common/swagger/dto/error-response.dto.ts',
       when: (c) => c.swagger && c.responseEnvelope,
     },
@@ -232,7 +259,7 @@ export function getCreateTemplateEntries(): TemplateEntry[] {
     },
     {
       template: 'create/features/users/user.entity.ts.hbs',
-      output: featurePath('users', 'entities', 'user.entity.ts'),
+      output: (ctx) => featurePath('users', ctx.isMicroservice ? 'domain' : '', 'entities', 'user.entity.ts')(ctx),
       when: (c) => c.usersModule,
     },
     {
@@ -326,120 +353,4 @@ export function getCreateTemplateEntries(): TemplateEntry[] {
       when: always,
     },
   ];
-}
-
-export function getGenerateModuleEntries(
-  config: ScaffoldConfig,
-  isFull?: boolean,
-  includeEntity?: boolean,
-): TemplateEntry[] {
-  const modulePath = (
-    ctx: TemplateContext,
-    ...rest: string[]
-  ): string =>
-    moduleFeaturePath(
-      ctx.moduleVersioning,
-      ctx.moduleVersion,
-      ctx.name,
-      ...rest,
-    );
-
-  const hasTypeorm = includeEntity ?? config.typeorm;
-
-  const entries: TemplateEntry[] = [
-    {
-      template: 'generate/module/module.ts.hbs',
-      output: (ctx) => modulePath(ctx, `${ctx.fileBase}.module.ts`),
-    },
-  ];
-
-  const isMicroservice = config.architecture === 'microservice';
-
-  if (isFull) {
-    entries.push(
-      {
-        template: 'generate/module/service.ts.hbs',
-        output: (ctx) => modulePath(ctx, `${ctx.fileBase}.service.ts`),
-      },
-      {
-        template: isMicroservice
-          ? 'generate/module/controller.grpc.ts.hbs'
-          : 'generate/module/controller.ts.hbs',
-        output: (ctx) => modulePath(ctx, `${ctx.fileBase}.controller${isMicroservice ? '.grpc' : ''}.ts`),
-      },
-      {
-        template: 'generate/module/service.spec.ts.hbs',
-        output: (ctx) => modulePath(ctx, `${ctx.fileBase}.service.spec.ts`),
-      },
-      ...(isMicroservice
-        ? []
-        : [{
-            template: 'generate/module/controller.spec.ts.hbs',
-            output: (ctx: TemplateContext) => modulePath(ctx, `${ctx.fileBase}.controller.spec.ts`),
-          }]
-      ),
-      {
-        template: 'generate/module/create.dto.ts.hbs',
-        output: (ctx) => modulePath(ctx, 'dto', `create-${ctx.entityFile}.dto.ts`),
-      },
-      {
-        template: 'generate/module/update.dto.ts.hbs',
-        output: (ctx) => modulePath(ctx, 'dto', `update-${ctx.entityFile}.dto.ts`),
-      },
-    );
-
-    if (isMicroservice) {
-      entries.push({
-        template: 'generate/controller/module.proto.hbs',
-        output: (ctx) => modulePath(ctx, 'proto', `${ctx.fileBase}.proto`),
-      });
-    }
-
-    if (config.pagination) {
-      entries.push(
-        {
-          template: 'generate/module/search.dto.ts.hbs',
-          output: (ctx) =>
-            modulePath(ctx, 'dto', `search-${ctx.entityFile}.dto.ts`),
-        },
-        {
-          template: 'generate/module/filter.query.ts.hbs',
-          output: (ctx) =>
-            modulePath(ctx, 'queries', `${ctx.entityFile}-filter.query.ts`),
-        },
-      );
-    }
-
-    if (config.responseEnvelope) {
-      entries.push({
-        template: 'generate/module/error-catalog.ts.hbs',
-        output: (ctx) => modulePath(ctx, `${ctx.entityFile}-error-catalog.ts`),
-      });
-    }
-
-    if (config.swagger) {
-      entries.push(
-        {
-          template: 'generate/module/swagger.decorator.ts.hbs',
-          output: (ctx) =>
-            modulePath(ctx, 'swagger', `${ctx.entityFile}-swagger.decorator.ts`),
-        },
-        {
-          template: 'generate/module/response.dto.ts.hbs',
-          output: (ctx) =>
-            modulePath(ctx, 'swagger', `${ctx.entityFile}-response.dto.ts`),
-        },
-      );
-    }
-  }
-
-  if (hasTypeorm) {
-    entries.push({
-      template: 'generate/module/entity.ts.hbs',
-      output: (ctx) =>
-        modulePath(ctx, 'entities', `${ctx.entityFile}.entity.ts`),
-    });
-  }
-
-  return entries;
 }

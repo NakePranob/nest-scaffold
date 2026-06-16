@@ -1,17 +1,14 @@
 import { Controller } from '@nestjs/common';
+{{#if hasService}}
 import { GrpcMethod } from '@nestjs/microservices';
 import { {{pascalName}}Service } from './{{fileBase}}.service';
-import { Create{{entityName}}Dto } from './dto/create-{{entityFile}}.dto';
 import { Update{{entityName}}Dto } from './dto/update-{{entityFile}}.dto';
+{{/if}}
 
 @Controller()
 export class {{pascalName}}Controller {
+  {{#if hasService}}
   constructor(private readonly {{camelName}}Service: {{pascalName}}Service) {}
-
-  @GrpcMethod('{{pascalName}}Service', 'Create')
-  create(dto: Create{{entityName}}Dto) {
-    return this.{{camelName}}Service.create(dto);
-  }
 
   @GrpcMethod('{{pascalName}}Service', 'FindAll')
   findAll(dto: Record<string, never>) {
@@ -24,12 +21,16 @@ export class {{pascalName}}Controller {
   }
 
   @GrpcMethod('{{pascalName}}Service', 'Update')
-  update(dto: { id: string; data: Update{{entityName}}Dto }) {
-    return this.{{camelName}}Service.update(dto.id, dto.data);
+  update(dto: Update{{entityName}}Dto & { id: string }) {
+    const { id, ...data } = dto;
+    return this.{{camelName}}Service.update(id, data);
   }
 
   @GrpcMethod('{{pascalName}}Service', 'Delete')
   delete(dto: { id: string }) {
     return this.{{camelName}}Service.delete(dto.id);
   }
+  {{else}}
+  constructor() {}
+  {{/if}}
 }

@@ -56,6 +56,7 @@ export interface TemplateContext
   hasController: boolean;
   isMonolith: boolean;
   isMicroservice: boolean;
+  protoPackage: string;
 }
 
 export type { ModulePathContext };

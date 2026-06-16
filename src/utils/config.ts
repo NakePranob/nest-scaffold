@@ -53,7 +53,7 @@ export function enforceDependencies(
   const next = { ...config };
 
   next.typeorm = true;
-  next.responseEnvelope = true;
+  next.responseEnvelope = config.architecture === 'monolith';
   next.pagination = true;
   next.orm = 'typeorm';
   next.database = 'postgres';
@@ -63,6 +63,9 @@ export function enforceDependencies(
     next.usersModule = false;
     next.auth = false;
     next.seeds = false;
+    next.moduleVersioning = false;
+    next.defaultModuleVersion = '';
+    next.moduleVersions = [];
   }
 
   if (!next.usersModule) {

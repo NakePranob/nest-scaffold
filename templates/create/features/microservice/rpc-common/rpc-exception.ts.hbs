@@ -1,0 +1,25 @@
+import { RpcException } from '@nestjs/microservices';
+import { RpcErrorDescriptor } from '../errors/rpc-error-catalog';
+
+export type RpcFieldError = {
+  field: string;
+  message: string;
+};
+
+type RpcExceptionPayload = {
+  code: string;
+  message: string;
+  details?: RpcFieldError[] | null;
+};
+
+export function createRpcException(
+  descriptor: RpcErrorDescriptor,
+  details?: RpcFieldError[] | null,
+): RpcException {
+  const payload: RpcExceptionPayload = {
+    code: descriptor.code,
+    message: descriptor.message,
+    details: details ?? null,
+  };
+  return new RpcException(payload);
+}

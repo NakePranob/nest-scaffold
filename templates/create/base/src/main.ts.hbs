@@ -7,13 +7,17 @@ import {
 {{/if}}
 {{#if isMicroservice}}
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { join } from 'path';
+import { grpcPackages, grpcProtoPaths } from './grpc/grpc.options';
+import { RpcValidationPipe } from './common/pipes/rpc-validation.pipe';
+import { RpcExceptionsFilter } from './common/filters/rpc-exception.filter';
 {{/if}}
 import { AppModule } from './app.module';
+{{#if isMonolith}}
 {{#if responseEnvelope}}
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { AppValidationPipe } from './common/pipes/validation.pipe';
+{{/if}}
 {{/if}}
 {{#if swagger}}
 import { setupSwagger } from './common/swagger/setup-swagger';
@@ -32,14 +36,15 @@ async function bootstrap() {
     {
       transport: Transport.GRPC,
       options: {
-        package: '{{projectName}}',
-        protoPath: join(__dirname, 'proto/{{projectName}}.proto'),
+        package: grpcPackages,
+        protoPath: grpcProtoPaths,
         url: process.env.GRPC_URL ?? '0.0.0.0:50051',
       },
     },
   );
 {{/if}}
 
+{{#if isMonolith}}
 {{#if responseEnvelope}}
   app.useGlobalPipes(
     new AppValidationPipe({
@@ -55,6 +60,7 @@ async function bootstrap() {
 {{else}}
   // Add ValidationPipe here if needed
 {{/if}}
+{{/if}}
 
 {{#if swagger}}
   if (process.env.NODE_ENV !== 'production') {
@@ -66,6 +72,8 @@ async function bootstrap() {
   await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
 {{/if}}
 {{#if isMicroservice}}
+  app.useGlobalPipes(new RpcValidationPipe());
+  app.useGlobalFilters(new RpcExceptionsFilter());
   await app.listen();
 {{/if}}
 }

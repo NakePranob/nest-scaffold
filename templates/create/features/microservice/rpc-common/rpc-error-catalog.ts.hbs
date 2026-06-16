@@ -1,0 +1,45 @@
+export enum RpcErrorCode {
+  InternalError = 'INTERNAL_ERROR',
+  ValidationError = 'VALIDATION_ERROR',
+  Unauthorized = 'UNAUTHORIZED',
+  Forbidden = 'FORBIDDEN',
+  NotFound = 'NOT_FOUND',
+  Conflict = 'CONFLICT',
+  InvalidArgument = 'INVALID_ARGUMENT',
+}
+
+export type RpcErrorDescriptor = {
+  code: RpcErrorCode;
+  message: string;
+};
+
+export const RPC_ERRORS = {
+  INTERNAL_ERROR: {
+    code: RpcErrorCode.InternalError,
+    message: 'Internal service error',
+  },
+  VALIDATION_ERROR: {
+    code: RpcErrorCode.ValidationError,
+    message: 'Validation failed',
+  },
+  UNAUTHORIZED: {
+    code: RpcErrorCode.Unauthorized,
+    message: 'Unauthorized',
+  },
+  FORBIDDEN: {
+    code: RpcErrorCode.Forbidden,
+    message: 'Forbidden',
+  },
+  NOT_FOUND: {
+    code: RpcErrorCode.NotFound,
+    message: 'Resource not found',
+  },
+  CONFLICT: {
+    code: RpcErrorCode.Conflict,
+    message: 'Conflict',
+  },
+  INVALID_ARGUMENT: {
+    code: RpcErrorCode.InvalidArgument,
+    message: 'Invalid argument',
+  },
+} as const satisfies Record<string, RpcErrorDescriptor>;

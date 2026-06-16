@@ -11,7 +11,8 @@ import {
   getTemplatesRoot,
 } from '../utils/template-renderer';
 import { registerModuleInAppModule } from '../utils/app-module-patcher';
-import { getGenerateModuleEntries } from '../templates/manifest';
+import { registerModuleGrpcProto } from '../utils/grpc-options-patcher';
+import { getGenerateModuleEntries } from '../templates/generate-manifest';
 import {
   promptModuleVersion,
   promptGenerateOptions,
@@ -76,7 +77,7 @@ export async function generateServiceCommand(
   const moduleExists = await fs.pathExists(modulePath2);
   if (!moduleExists || hasController) {
     const moduleContent = await renderTemplateFile(
-      path.join(getTemplatesRoot(), 'generate/module/module.ts.hbs'),
+      path.join(getTemplatesRoot(), 'generate/module/shared/module.ts.hbs'),
       context,
     );
     await fs.ensureDir(moduleDir);
@@ -155,7 +156,7 @@ export async function generateControllerCommand(
   const moduleExists = await fs.pathExists(modulePath2);
   if (!moduleExists || hasService) {
     const moduleContent = await renderTemplateFile(
-      path.join(getTemplatesRoot(), 'generate/module/module.ts.hbs'),
+      path.join(getTemplatesRoot(), 'generate/module/shared/module.ts.hbs'),
       context,
     );
     await fs.ensureDir(moduleDir);
@@ -175,8 +176,8 @@ export async function generateControllerCommand(
   }
 
   const controllerTemplate = config.architecture === 'microservice'
-    ? 'generate/controller/controller.grpc.ts.hbs'
-    : 'generate/controller/controller.ts.hbs';
+    ? 'generate/controller/microservice/controller.ts.hbs'
+    : 'generate/controller/monolith/controller.ts.hbs';
 
   await fs.writeFile(controllerPath, await renderTemplateFile(
     path.join(getTemplatesRoot(), controllerTemplate),
@@ -189,10 +190,11 @@ export async function generateControllerCommand(
     const protoPath = path.join(protoDir, `${naming.fileBase}.proto`);
     if (!(await fs.pathExists(protoPath))) {
       await fs.writeFile(protoPath, await renderTemplateFile(
-        path.join(getTemplatesRoot(), 'generate/controller/module.proto.hbs'),
+        path.join(getTemplatesRoot(), 'generate/controller/microservice/proto.hbs'),
         context,
       ));
     }
+    await registerModuleGrpcProto(projectRoot, config, moduleVersion ?? '', naming);
   }
 
   console.log(pc.green(`\n✓ Controller "${versionLabel}${naming.name}" generated successfully!\n`));
@@ -263,6 +265,10 @@ export async function generateModuleCommand(
     naming.moduleClass,
     importPath,
   );
+
+  if (config.architecture === 'microservice' && isFull) {
+    await registerModuleGrpcProto(projectRoot, config, moduleVersion ?? '', naming, { infraLayer: true });
+  }
 
   console.log(
     pc.green(`\n✓ Module "${versionLabel}${naming.name}" generated successfully!\n`),

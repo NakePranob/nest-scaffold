@@ -1,13 +1,25 @@
 import { Module } from '@nestjs/common';
 {{#if hasTypeorm}}
 import { TypeOrmModule } from '@nestjs/typeorm';
+{{#if isMicroservice}}
+import { {{entityName}} } from './domain/entities/{{entityFile}}.entity';
+{{else}}
 import { {{entityName}} } from './entities/{{entityFile}}.entity';
 {{/if}}
+{{/if}}
 {{#if hasController}}
-import { {{pascalName}}Controller } from './{{fileBase}}.controller{{#if isMicroservice}}.grpc{{/if}}';
+{{#if isMicroservice}}
+import { {{pascalName}}Controller } from './infrastructure/{{fileBase}}.controller.grpc';
+{{else}}
+import { {{pascalName}}Controller } from './{{fileBase}}.controller';
+{{/if}}
 {{/if}}
 {{#if hasService}}
+{{#if isMicroservice}}
+import { {{pascalName}}Service } from './application/{{fileBase}}.service';
+{{else}}
 import { {{pascalName}}Service } from './{{fileBase}}.service';
+{{/if}}
 {{/if}}
 
 @Module({

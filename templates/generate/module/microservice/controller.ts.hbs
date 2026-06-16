@@ -1,0 +1,24 @@
+import { Controller } from '@nestjs/common';
+import { GrpcMethod, Payload } from '@nestjs/microservices';
+import { {{pascalName}}Service } from '../application/{{fileBase}}.service';
+{{#if hasTypeorm}}
+import { Get{{entityName}}RequestDto } from '../dto/get-{{entityFile}}-request.dto';
+{{/if}}
+
+@Controller()
+export class {{pascalName}}Controller {
+  constructor(private readonly {{camelName}}Service: {{pascalName}}Service) {}
+
+{{#if hasTypeorm}}
+  @GrpcMethod('{{pascalName}}Service', 'Get{{entityName}}')
+  get{{entityName}}(@Payload() request: Get{{entityName}}RequestDto) {
+    return this.{{camelName}}Service.get{{entityName}}(request);
+  }
+{{else}}
+  // Add @GrpcMethod handlers matching your proto RPCs
+  // @GrpcMethod('{{pascalName}}Service', 'Get{{entityName}}')
+  // get{{entityName}}(@Payload() request: Get{{entityName}}RequestDto) {
+  //   return this.{{camelName}}Service.get{{entityName}}(request);
+  // }
+{{/if}}
+}

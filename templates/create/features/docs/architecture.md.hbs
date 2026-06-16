@@ -40,22 +40,48 @@ src/
 
 ## 4. Response and Error Model
 
+{{#if isMicroservice}}
+**Decision:** Contract-first gRPC responses from `.proto` messages
+**Rationale:** gRPC handlers should return payloads that match protobuf contracts without HTTP-specific envelope wrappers
+
+- Response shapes follow protobuf message definitions
+- Errors should use RPC-compatible exceptions (`RpcException`) at handler/service boundaries
+- Request DTOs mirror `.proto` messages and use class-validator for validation through `RpcValidationPipe`
+{{else}}
 **Decision:** Unified success/error shape
 **Rationale:** Interceptors and exception filters keep response formatting consistent across the application
 
 - Successful responses are wrapped by `ResponseInterceptor`
 - Error responses are normalized by `AllExceptionsFilter`
 - Domain errors should be sourced from the error catalog instead of hardcoded payloads
+- Request DTOs (`CreateDto`, `UpdateDto`) are optional and used with Swagger decorators
+{{/if}}
 
-## 5. Query and Pagination Pattern
+## 5. Module Versioning
+
+{{#if isMicroservice}}
+**Decision:** Proto package versioning (no folder versioning)
+**Rationale:** gRPC microservices versioning is managed through `.proto` package names, not folder paths
+- Version is encoded in `.proto` package: `package orders.v1;`
+- All modules live in `src/modules/<feature>` without version subfolders
+{{else}}
+**Decision:** Optional folder-based module versioning
+**Rationale:** API versioning can be managed through folder hierarchies (e.g. `src/modules/v1/orders`)
+- When enabled: modules are organized under `v1/`, `v2/`, etc.
+- When disabled: modules live directly in `src/modules/`
+- Use `nest-scaffold generate module <name> --moduleVersion v2` to add to a specific version
+{{/if}}
+
+## 6. Query and Pagination Pattern
 
 **Decision:** DTO-driven pagination + per-feature query helpers
 **Rationale:** Filter and search concerns are separated from controllers and services to keep list endpoints easier to maintain
 
 - The shared pagination DTO lives at `src/common/dto/pagination.dto.ts`
 - Feature-specific query helpers live under `queries/`
+{{#if isMicroservice}}- Not used in gRPC microservices{{/if}}
 
-## 6. Persistence
+## 7. Persistence
 
 **Decision:** PostgreSQL + TypeORM
 **Rationale:** The scaffold is built around TypeORM with PostgreSQL as the default persistence choice
@@ -64,20 +90,21 @@ src/
 {{/if}}{{#if docker}}- A `docker-compose.yml` file is included for the local database environment
 {{/if}}
 
-{{#if hasAuth}}## 7. Authentication
+{{#if hasAuth}}## 8. Authentication
 
 **Decision:** JWT with Passport strategy
 **Rationale:** The auth scaffold follows standard NestJS patterns with guards, strategies, decorators, and services
 {{/if}}
 
-{{#if hasSwagger}}## 8. API Documentation
+{{#if hasSwagger}}## {{#if hasAuth}}9{{else}}8{{/if}}. API Documentation
 
 **Decision:** Swagger decorators + shared setup
 **Rationale:** API documentation is generated from code-first decorators and a shared setup under `src/common/swagger/`
 {{/if}}
 
-## 9. Evolution Notes
+## {{#if hasSwagger}}{{#if hasAuth}}10{{else}}9{{/if}}{{else}}{{#if hasAuth}}9{{else}}8{{/if}}{{/if}}. Evolution Notes
 
 - `nest-scaffold generate module <name>` adds a new feature module and registers it in `AppModule`
-- When module versioning is enabled, generation can target version folders such as `v1` and `v2`
-- This document only reflects the initial scaffold and should be updated as the real architecture evolves
+{{#if isMicroservice}}- Proto messages and RPC definitions grow with your domain model — keep `.proto` files in sync with your service layer
+{{else}}- When module versioning is enabled, generation can target version folders such as `v1` and `v2`
+{{/if}}- This document only reflects the initial scaffold and should be updated as the real architecture evolves

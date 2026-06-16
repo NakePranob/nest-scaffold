@@ -1,0 +1,44 @@
+import { ValidationPipe, ValidationPipeOptions } from '@nestjs/common';
+import { ValidationError } from 'class-validator';
+import { RPC_ERRORS } from '../errors/rpc-error-catalog';
+import { createRpcException, RpcFieldError } from '../helpers/rpc-exception';
+
+function flattenValidationErrors(
+  errors: ValidationError[],
+  parentPath?: string,
+): RpcFieldError[] {
+  return errors.flatMap((error) => {
+    const field = parentPath
+      ? `${parentPath}.${error.property}`
+      : error.property;
+    const messages = Object.values(error.constraints ?? {}).map((message) => ({
+      field,
+      message,
+    }));
+
+    if (error.children?.length) {
+      return [...messages, ...flattenValidationErrors(error.children, field)];
+    }
+
+    return messages;
+  });
+}
+
+export class RpcValidationPipe extends ValidationPipe {
+  constructor(options: ValidationPipeOptions = {}) {
+    const hideDetails = options.disableErrorMessages === true;
+    super({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+      ...options,
+      exceptionFactory:
+        options.exceptionFactory ??
+        ((errors) =>
+          createRpcException(
+            RPC_ERRORS.VALIDATION_ERROR,
+            hideDetails ? null : flattenValidationErrors(errors),
+          )),
+    });
+  }
+}

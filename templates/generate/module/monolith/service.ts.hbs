@@ -13,9 +13,18 @@ import { PaginatedResult } from '{{commonFromModule}}/interfaces/paginated-resul
 {{/if}}
 {{#if hasEnvelope}}
 import { AppException } from '{{commonFromModule}}/helpers/app-exception';
+{{else}}
+{{#if isMicroservice}}
+import { createRpcException } from '{{commonFromModule}}/helpers/rpc-exception';
+{{/if}}
+{{/if}}
 {{#if hasTypeorm}}
 import { isUniqueConstraintError } from '{{commonFromModule}}/helpers/database-error';
 {{/if}}
+{{#if hasEnvelope}}
+import { {{errorPrefix}}_ERRORS } from './{{entityFile}}-error-catalog';
+{{/if}}
+{{#if isMicroservice}}
 import { {{errorPrefix}}_ERRORS } from './{{entityFile}}-error-catalog';
 {{/if}}
 
@@ -34,11 +43,15 @@ export class {{pascalName}}Service {
     try {
       return await this.repo.save(entity);
     } catch (error) {
-{{#if hasEnvelope}}
       if (isUniqueConstraintError(error)) {
+{{#if hasEnvelope}}
         throw AppException.from({{errorPrefix}}_ERRORS.{{errorPrefix}}_ALREADY_EXISTS);
-      }
+{{else}}
+{{#if isMicroservice}}
+        throw createRpcException({{errorPrefix}}_ERRORS.{{errorPrefix}}_ALREADY_EXISTS);
 {{/if}}
+{{/if}}
+      }
       throw error;
     }
   }
@@ -64,6 +77,10 @@ export class {{pascalName}}Service {
     const entity = await this.repo.findOneBy({ id });
 {{#if hasEnvelope}}
     if (!entity) throw AppException.from({{errorPrefix}}_ERRORS.{{errorPrefix}}_NOT_FOUND);
+{{else}}
+{{#if isMicroservice}}
+    if (!entity) throw createRpcException({{errorPrefix}}_ERRORS.{{errorPrefix}}_NOT_FOUND);
+{{/if}}
 {{/if}}
     return entity;
   }
@@ -79,6 +96,12 @@ export class {{pascalName}}Service {
     if (result.affected === 0) {
       throw AppException.from({{errorPrefix}}_ERRORS.{{errorPrefix}}_NOT_FOUND);
     }
+{{else}}
+{{#if isMicroservice}}
+    if (result.affected === 0) {
+      throw createRpcException({{errorPrefix}}_ERRORS.{{errorPrefix}}_NOT_FOUND);
+    }
+{{/if}}
 {{/if}}
   }
 {{else}}

@@ -1,0 +1,32 @@
+import { Injectable } from '@nestjs/common';
+{{#if hasTypeorm}}
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { {{entityName}} } from '../domain/entities/{{entityFile}}.entity';
+{{/if}}
+import { createRpcException } from '{{commonFromNested}}/helpers/rpc-exception';
+import { {{errorPrefix}}_ERRORS } from '../domain/{{entityFile}}-error-catalog';
+{{#if hasTypeorm}}
+import { Get{{entityName}}RequestDto } from '../dto/get-{{entityFile}}-request.dto';
+{{/if}}
+
+@Injectable()
+export class {{pascalName}}Service {
+  constructor(
+{{#if hasTypeorm}}
+    @InjectRepository({{entityName}})
+    private readonly repo: Repository<{{entityName}}>,
+{{/if}}
+  ) {}
+
+{{#if hasTypeorm}}
+  async get{{entityName}}(request: Get{{entityName}}RequestDto): Promise<{{entityName}}> {
+    const entity = await this.repo.findOneBy({ id: request.id });
+    if (!entity) throw createRpcException({{errorPrefix}}_ERRORS.{{errorPrefix}}_NOT_FOUND);
+    return entity;
+  }
+{{else}}
+  // Define use-case methods that match your proto RPCs
+  // e.g. async get{{entityName}}(request: Get{{entityName}}RequestDto): Promise<...> {}
+{{/if}}
+}

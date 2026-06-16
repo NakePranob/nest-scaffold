@@ -8,7 +8,7 @@ import {
   applyTemplateEntries,
   buildTemplateContext,
 } from '../utils/template-renderer';
-import { getCreateTemplateEntries } from '../templates/manifest';
+import { getCreateTemplateEntries } from '../templates/create-manifest';
 
 export async function createCommand(
   projectNameArg?: string,

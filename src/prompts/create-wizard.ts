@@ -51,7 +51,7 @@ const STEPS: WizardStep[] = [
     key: 'moduleVersioning',
     message: 'Organize modules under version folder (e.g. v1)?',
     default: false,
-    when: () => true,
+    when: (_, arch) => arch === 'monolith',
   },
   {
     key: 'e2e',

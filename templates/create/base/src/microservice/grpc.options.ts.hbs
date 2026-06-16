@@ -1,0 +1,7 @@
+import { join } from 'path';
+
+export const grpcPackages: string[] = ['{{protoPackage}}'];
+
+export const grpcProtoPaths: string[] = [
+  join(__dirname, '..', 'proto', '{{projectName}}.proto'),
+];

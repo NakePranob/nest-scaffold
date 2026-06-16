@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package {{protoPackage}};
+
+// Use-case oriented RPC definitions — one RPC per business action
+service {{pascalName}}Service {
+  rpc Get{{entityName}} (Get{{entityName}}Request) returns ({{entityName}}Response);
+  // Add use-case RPCs here, e.g.:
+  // rpc Create{{entityName}} (Create{{entityName}}Request) returns ({{entityName}}Response);
+  // rpc Update{{entityName}} (Update{{entityName}}Request) returns ({{entityName}}Response);
+  // rpc Delete{{entityName}} (Delete{{entityName}}Request) returns (DeleteResponse);
+}
+
+message Get{{entityName}}Request {
+  string id = 1;
+}
+
+message {{entityName}}Response {
+  string id = 1;
+  // Add response fields here
+}
+
+message DeleteResponse {
+  bool success = 1;
+}

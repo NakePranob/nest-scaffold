@@ -6,6 +6,7 @@ import { ScaffoldConfig, TemplateContext, ModuleNaming } from '../types';
 import { STACK_LABEL, STACK_VERSIONS } from '../stack-versions';
 import { resolveModuleNaming } from './naming';
 import { resolveModulePathContext } from './module-paths';
+import { toProtoPackage } from './proto-package';
 
 Handlebars.registerHelper('eq', (a, b) => a === b);
 Handlebars.registerHelper('json', (value) => JSON.stringify(value));
@@ -33,6 +34,9 @@ export function buildTemplateContext(
   options?: { includeEntity?: boolean; hasService?: boolean; hasController?: boolean },
 ): TemplateContext {
   const moduleNaming = naming ?? resolveModuleNaming('example');
+  const protoPackage = toProtoPackage(
+    naming ? moduleNaming.name : config.projectName,
+  );
   const version =
     moduleVersion ??
     (config.moduleVersioning ? config.defaultModuleVersion : '');
@@ -60,6 +64,7 @@ export function buildTemplateContext(
     hasController: options?.hasController ?? true,
     isMonolith: config.architecture === 'monolith',
     isMicroservice: config.architecture === 'microservice',
+    protoPackage,
   };
 }
 

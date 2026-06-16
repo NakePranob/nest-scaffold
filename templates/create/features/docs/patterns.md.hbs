@@ -39,9 +39,27 @@ src/
 │       ├── auth.service.ts
 │       ├── auth.service.spec.ts
 │       └── auth.module.ts
-{{/if}}{{#if isMicroservice}}├── health.controller.grpc.ts
+{{/if}}{{#if isMicroservice}}├── health.controller.ts
+├── grpc/
+│   └── grpc.options.ts
 ├── proto/
 │   └── {{projectName}}.proto
+{{/if}}{{#if isMicroservice}}
+// Generated module (generate module <name> --full):
+// modules/<feature>/
+// ├── application/           ← use-case orchestration
+// │   ├── <feature>.service.ts
+// │   └── <feature>.service.spec.ts
+// ├── domain/                ← entities + domain errors
+// │   ├── entities/
+// │   │   └── <entity>.entity.ts
+// │   └── <entity>-error-catalog.ts
+// ├── infrastructure/        ← gRPC adapter + proto
+// │   ├── <feature>.controller.grpc.ts
+// │   └── proto/
+// │       └── <feature>.proto
+// ├── dto/                   ← request DTOs
+// └── <feature>.module.ts
 {{/if}}{{#if isMonolith}}├── app.controller.ts
 ├── app.controller.spec.ts
 ├── app.service.ts
@@ -64,20 +82,44 @@ test/
 ## Layer Conventions
 
 ### Controller
-{{#if isMicroservice}}- Uses `@GrpcMethod()` decorator and gRPC request/response types
-{{else}}- Owns routes, validation, auth guards, and response metadata
-{{/if}}- Should not contain business logic directly
+{{#if isMicroservice}}
+- Lives in `infrastructure/` — thin gRPC adapter only
+- One `@GrpcMethod()` per proto RPC, delegates immediately to application service
+- No business logic, no error handling — errors bubble up through `RpcExceptionsFilter`
+{{else}}
+- Owns routes, validation, auth guards, and response metadata
+- Should not contain business logic directly
 - Delegates work to the service layer
+{{/if}}
 
 ### Service
+{{#if isMicroservice}}
+- Lives in `application/` — orchestrates domain/repository logic per use case
+- Method names match proto RPCs (e.g. `getOrder` ↔ `rpc GetOrder`)
+- Throws `createRpcException(ERROR_CATALOG.ITEM)` for domain errors
+{{else}}
 - Contains the business logic for each feature
 - Handles persistence through repositories and query helpers
 - Throws `AppException.from(ERROR_CATALOG.ITEM)` for domain errors
+{{/if}}
+
+### Request & Response DTOs
+{{#if isMicroservice}}
+- **Microservice**: DTOs mirror `.proto` messages — one DTO per RPC request type
+  - `GetOrderRequestDto` (with class-validator decorators `@IsString()`, `@IsUUID()`, etc.)
+  - Used with `@Payload()` decorator in controller for automatic validation via `RpcValidationPipe`
+  - Response types are `.proto` message contracts directly (entities or response DTOs)
+{{else}}
+- **Monolith**: Traditional HTTP CRUD DTOs
+  - `CreateOrderDto`, `UpdateOrderDto` for request bodies
+  - `OrderResponseDto` for Swagger/OpenAPI documentation
+{{/if}}
 
 ### Query Helper
 - Files in `queries/` isolate filter and search logic for list endpoints
 - Only handles data-access concerns
 - The service remains the main orchestration layer
+{{#if isMicroservice}}- Not used in microservices (gRPC uses request message fields for filtering){{/if}}
 
 ### Module
 - Bundles the controller, service, providers, and imports for a feature
@@ -85,9 +127,16 @@ test/
 
 ## Error Handling Conventions
 
+{{#if isMicroservice}}
+- Use `RpcValidationPipe` as the global validation pipe
+- Use `RpcExceptionsFilter` as the global exception filter
+- Return success payloads that match `.proto` contracts directly (no HTTP envelope)
+- The shared error catalog lives in `src/common/errors/rpc-error-catalog.ts`
+{{else}}
 - Successful responses are wrapped by `ResponseInterceptor`
 - Error responses are normalized by `AllExceptionsFilter`
 - The shared error catalog lives in `src/common/errors/app-error-catalog.ts`
+{{/if}}
 {{#if hasUsersModule}}- The users module keeps feature-specific business errors in `user-error-catalog.ts`
 {{/if}}{{#if hasAuth}}- The auth module keeps feature-specific business errors in `auth-error-catalog.ts`
 {{/if}}- Avoid hardcoding `code` and `message` values inside services

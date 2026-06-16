@@ -1,0 +1,34 @@
+import { ArgumentsHost, Catch, RpcExceptionFilter } from '@nestjs/common';
+import { RpcException } from '@nestjs/microservices';
+import { Observable, throwError } from 'rxjs';
+import { RPC_ERRORS } from '../errors/rpc-error-catalog';
+
+type RpcErrorPayload = {
+  code: string;
+  message: string;
+  details?: unknown;
+};
+
+@Catch()
+export class RpcExceptionsFilter
+  implements RpcExceptionFilter<RpcException | Error | unknown>
+{
+  catch(exception: RpcException | Error | unknown, _host: ArgumentsHost): Observable<never> {
+    if (exception instanceof RpcException) {
+      return throwError(() => exception.getError());
+    }
+
+    const payload: RpcErrorPayload = {
+      code: RPC_ERRORS.INTERNAL_ERROR.code,
+      message: RPC_ERRORS.INTERNAL_ERROR.message,
+      details:
+        process.env.NODE_ENV === 'production'
+          ? null
+          : exception instanceof Error
+            ? { name: exception.name, message: exception.message }
+            : { message: String(exception) },
+    };
+
+    return throwError(() => payload);
+  }
+}

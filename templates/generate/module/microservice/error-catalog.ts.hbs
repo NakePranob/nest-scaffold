@@ -1,0 +1,17 @@
+import { RpcErrorDescriptor } from '{{commonFromModule}}/errors/rpc-error-catalog';
+
+export enum {{pascalName}}ErrorCode {
+  NotFound = '{{errorPrefix}}_NOT_FOUND',
+  AlreadyExists = '{{errorPrefix}}_ALREADY_EXISTS',
+}
+
+export const {{errorPrefix}}_ERRORS = {
+  {{errorPrefix}}_NOT_FOUND: {
+    code: {{pascalName}}ErrorCode.NotFound,
+    message: '{{entityName}} not found',
+  },
+  {{errorPrefix}}_ALREADY_EXISTS: {
+    code: {{pascalName}}ErrorCode.AlreadyExists,
+    message: '{{entityName}} already exists',
+  },
+} as const satisfies Record<string, RpcErrorDescriptor>;
