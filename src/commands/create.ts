@@ -14,17 +14,18 @@ export async function createCommand(
   projectNameArg?: string,
   options?: { directory?: string; defaults?: boolean },
 ): Promise<void> {
-  const projectName = projectNameArg
+  const requestedPath = projectNameArg
     ? projectNameArg.trim()
     : await promptProjectName();
+  const targetDir = path.resolve(
+    options?.directory ?? process.cwd(),
+    requestedPath,
+  );
+  const projectName = path.basename(targetDir);
 
   const config = options?.defaults
     ? getDefaultConfig(projectName)
     : await runCreateWizard(projectName);
-  const targetDir = path.resolve(
-    options?.directory ?? process.cwd(),
-    projectName,
-  );
 
   if (await fs.pathExists(targetDir)) {
     const files = await fs.readdir(targetDir);
@@ -47,7 +48,7 @@ export async function createCommand(
 
   console.log(pc.green('\n✓ Project created successfully!\n'));
   console.log('Next steps:');
-  console.log(`  cd ${projectName}`);
+  console.log(`  cd ${targetDir}`);
   if (config.docker) {
     console.log('  docker compose up -d');
   }
