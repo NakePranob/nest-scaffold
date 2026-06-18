@@ -30,7 +30,7 @@
   "author": "nakedev",
   "license": "MIT",
   "dependencies": {
-    "@inquirer/prompts": "^7.5.1",
+    "@inquirer/prompts": "^8.5.2",
     "commander": "^13.1.0",
     "fs-extra": "^11.3.0",
     "handlebars": "^4.7.8",
