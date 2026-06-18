@@ -11,10 +11,10 @@
 | Runtime target | Node.js >= 20 |
 | Framework | NestJS `{{stack.nestCommon}}` |
 {{#if isMonolith}}| HTTP Adapter | Fastify (`@nestjs/platform-fastify` `{{stack.nestPlatformFastify}}`) |
-{{/if}}{{#if isMicroservice}}| Transport | gRPC (`@nestjs/microservices` `{{stack.nestMicroservices}}`, `@grpc/grpc-js` `{{stack.grpcJs}}`) |
+{{/if}}{{#if isMicroservice}}| Transport | gRPC (`@nestjs/microservices` `{{stack.nestMicroservices}}`) |
 {{/if}}| Database | PostgreSQL |
 | ORM | TypeORM (`@nestjs/typeorm` `{{stack.nestTypeorm}}`) |
-{{#if auth}}| Auth | JWT + Passport (`@nestjs/jwt` `{{stack.nestJwt}}`, `@nestjs/passport` `{{stack.nestPassport}}`) |{{/if}}
+{{#if auth}}| Auth | JWT + Passport (`@nestjs/jwt` `{{stack.nestJwt}}`) |{{/if}}
 {{#if swagger}}| API Docs | Swagger (`@nestjs/swagger` `{{stack.nestSwagger}}`) |{{/if}}
 | Validation | `class-validator` `{{stack.classValidator}}` + `class-transformer` `{{stack.classTransformer}}` |
 | Testing | Jest `{{stack.jest}}` + `@nestjs/testing` `{{stack.nestTesting}}` |

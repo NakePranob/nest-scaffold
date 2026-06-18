@@ -1,6 +1,6 @@
 import { ModuleNaming } from '../types';
 
-function toPascalCase(value: string): string {
+export function toPascalCase(value: string): string {
   return value
     .replace(/[-_\s]+(.)?/g, (_, char: string) => char.toUpperCase())
     .replace(/^(.)/, (char) => char.toUpperCase());

@@ -3,3 +3,5 @@ dist/
 *.tgz
 .DS_Store
 stack-update-report.md
+.hermes/
+.pnpm-store/

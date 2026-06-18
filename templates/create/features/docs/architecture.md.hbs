@@ -6,7 +6,9 @@
 ## 1. Architecture Topology
 
 **Decision:** {{#if isMicroservice}}Backend microservice over gRPC{{else}}Backend-only monolith{{/if}}
-**Rationale:** {{#if isMicroservice}}This CLI scaffolds a standalone NestJS microservice that communicates via gRPC protocol{{else}}This CLI scaffolds a single NestJS application that keeps all feature modules inside one service{{/if}}
+**Rationale:** {{#if isMicroservice}}This CLI scaffolds a standalone NestJS microservice
+that communicates via gRPC protocol{{else}}This CLI scaffolds a single NestJS application
+that keeps all feature modules inside one service{{/if}}
 
 ## 2. Module Layout
 
@@ -32,28 +34,35 @@ src/
 
 {{#if isMicroservice}}
 **Decision:** gRPC over `@nestjs/microservices`
-**Rationale:** The scaffold generates gRPC controllers with `@GrpcMethod()` and `.proto` definitions as the primary contract
+**Rationale:** The scaffold generates gRPC controllers with `@GrpcMethod()` and `.proto`
+definitions as the primary contract
 {{else}}
 **Decision:** REST over Fastify
-**Rationale:** The scaffold uses `@nestjs/platform-fastify` as the primary HTTP adapter and generates controllers for REST endpoints
+**Rationale:** The scaffold uses `@nestjs/platform-fastify` as the primary HTTP adapter
+and generates controllers for REST endpoints
 {{/if}}
 
 ## 4. Response and Error Model
 
 {{#if isMicroservice}}
 **Decision:** Contract-first gRPC responses from `.proto` messages
-**Rationale:** gRPC handlers should return payloads that match protobuf contracts without HTTP-specific envelope wrappers
+**Rationale:** gRPC handlers should return payloads that match protobuf contracts
+without HTTP-specific envelope wrappers
 
 - Response shapes follow protobuf message definitions
-- Errors should use RPC-compatible exceptions (`RpcException`) at handler/service boundaries
-- Request DTOs mirror `.proto` messages and use class-validator for validation through `RpcValidationPipe`
+- Errors should use RPC-compatible exceptions (`RpcException`) at handler/service
+  boundaries
+- Request DTOs mirror `.proto` messages and use class-validator for validation
+  through `RpcValidationPipe`
 {{else}}
 **Decision:** Unified success/error shape
-**Rationale:** Interceptors and exception filters keep response formatting consistent across the application
+**Rationale:** Interceptors and exception filters keep response formatting
+consistent across the application
 
 - Successful responses are wrapped by `ResponseInterceptor`
 - Error responses are normalized by `AllExceptionsFilter`
-- Domain errors should be sourced from the error catalog instead of hardcoded payloads
+- Domain errors should be sourced from the error catalog instead of hardcoded
+  payloads
 - Request DTOs (`CreateDto`, `UpdateDto`) are optional and used with Swagger decorators
 {{/if}}
 
@@ -61,21 +70,25 @@ src/
 
 {{#if isMicroservice}}
 **Decision:** Proto package versioning (no folder versioning)
-**Rationale:** gRPC microservices versioning is managed through `.proto` package names, not folder paths
+**Rationale:** gRPC microservices versioning is managed through `.proto` package
+names, not folder paths
 - Version is encoded in `.proto` package: `package orders.v1;`
 - All modules live in `src/modules/<feature>` without version subfolders
 {{else}}
 **Decision:** Optional folder-based module versioning
-**Rationale:** API versioning can be managed through folder hierarchies (e.g. `src/modules/v1/orders`)
+**Rationale:** API versioning can be managed through folder hierarchies
+(e.g. `src/modules/v1/orders`)
 - When enabled: modules are organized under `v1/`, `v2/`, etc.
 - When disabled: modules live directly in `src/modules/`
-- Use `nest-scaffold generate module <name> --moduleVersion v2` to add to a specific version
+- Use `nest-scaffold generate module <name> --moduleVersion v2` to add to a
+  specific version
 {{/if}}
 
 ## 6. Query and Pagination Pattern
 
 **Decision:** DTO-driven pagination + per-feature query helpers
-**Rationale:** Filter and search concerns are separated from controllers and services to keep list endpoints easier to maintain
+**Rationale:** Filter and search concerns are separated from controllers and
+services to keep list endpoints easier to maintain
 
 - The shared pagination DTO lives at `src/common/dto/pagination.dto.ts`
 - Feature-specific query helpers live under `queries/`
@@ -93,7 +106,8 @@ src/
 {{#if hasAuth}}## 8. Authentication
 
 **Decision:** JWT with Passport strategy
-**Rationale:** The auth scaffold follows standard NestJS patterns with guards, strategies, decorators, and services
+**Rationale:** The auth scaffold follows standard NestJS patterns with guards,
+strategies, decorators, and services
 {{/if}}
 
 {{#if hasSwagger}}## {{#if hasAuth}}9{{else}}8{{/if}}. API Documentation
@@ -105,6 +119,9 @@ src/
 ## {{#if hasSwagger}}{{#if hasAuth}}10{{else}}9{{/if}}{{else}}{{#if hasAuth}}9{{else}}8{{/if}}{{/if}}. Evolution Notes
 
 - `nest-scaffold generate module <name>` adds a new feature module and registers it in `AppModule`
-{{#if isMicroservice}}- Proto messages and RPC definitions grow with your domain model — keep `.proto` files in sync with your service layer
-{{else}}- When module versioning is enabled, generation can target version folders such as `v1` and `v2`
-{{/if}}- This document only reflects the initial scaffold and should be updated as the real architecture evolves
+{{#if isMicroservice}}- Proto messages and RPC definitions grow with your domain model;
+  keep `.proto` files in sync with your service layer
+{{else}}- When module versioning is enabled, generation can target version folders
+  such as `v1` and `v2`
+{{/if}}- This document only reflects the initial scaffold and should be updated as
+  the real architecture evolves

@@ -41,6 +41,10 @@ export interface StackVersionsContext {
   stackLabel: string;
 }
 
+export type MethodType = 'get' | 'post' | 'put' | 'patch' | 'delete';
+
+export type GetMethodMode = 'all' | 'one';
+
 export interface TemplateContext
   extends ScaffoldConfig,
     ModuleNaming,
