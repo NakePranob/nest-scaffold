@@ -1,6 +1,7 @@
 import path from 'node:path';
 import fs from 'fs-extra';
 import { ScaffoldConfig } from '../types';
+import { detectConfig } from './detector';
 
 export const CONFIG_FILENAME = 'nest-scaffold.config.json';
 
@@ -74,4 +75,37 @@ export function enforceDependencies(
   }
 
   return next;
+}
+
+/**
+ * Resolve the ScaffoldConfig for a project.
+ * Tries reading the config file first, falls back to auto-detection.
+ */
+export async function resolveProjectConfig(
+  projectRoot: string,
+): Promise<ScaffoldConfig> {
+  return (await readConfig(projectRoot)) ?? (await detectConfig(projectRoot));
+}
+
+/**
+ * Register a module version and persist to config if it's new.
+ * Returns the (possibly updated) config.
+ */
+export async function ensureModuleVersion(
+  projectRoot: string,
+  config: ScaffoldConfig,
+  moduleVersion?: string,
+): Promise<ScaffoldConfig> {
+  if (!moduleVersion || config.moduleVersions.includes(moduleVersion)) {
+    return config;
+  }
+
+  const updated: ScaffoldConfig = {
+    ...config,
+    moduleVersioning: true,
+    moduleVersions: [...config.moduleVersions, moduleVersion].sort(),
+    defaultModuleVersion: config.defaultModuleVersion || moduleVersion,
+  };
+  await writeConfig(projectRoot, updated);
+  return updated;
 }

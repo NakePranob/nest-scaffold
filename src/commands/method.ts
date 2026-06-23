@@ -1,5 +1,4 @@
 import path from 'node:path';
-import { createRequire } from 'node:module';
 import fs from 'fs-extra';
 import pc from 'picocolors';
 import { input } from '@inquirer/prompts';
@@ -8,8 +7,7 @@ import {
   Project,
   QuoteKind,
 } from 'ts-morph';
-import { readConfig, writeConfig } from '../utils/config';
-import { detectConfig } from '../utils/detector';
+import { readConfig, writeConfig, resolveProjectConfig, ensureModuleVersion } from '../utils/config';
 import { resolveModuleNaming } from '../utils/naming';
 import { normalizeIdentifier } from '../utils/identifiers';
 import { registerModuleGrpcProto } from '../utils/grpc-options-patcher';
@@ -48,16 +46,10 @@ import type {
   ModuleNaming,
   ScaffoldConfig,
 } from '../types';
-
-interface PrettierModule {
-  resolveConfig(filePath: string): Promise<Record<string, unknown> | null>;
-  getFileInfo(filePath: string): Promise<{ ignored: boolean; inferredParser?: string | null }>;
-  format(source: string, options: Record<string, unknown>): Promise<string>;
-}
-
-async function resolveProjectConfig(projectRoot: string) {
-  return (await readConfig(projectRoot)) ?? (await detectConfig(projectRoot));
-}
+import {
+  loadPrettierFromProject,
+  formatFilesWithPrettier as formatFiles,
+} from '../utils/prettier-formatter';
 
 function normalizeMethodName(value: string): string {
   return normalizeIdentifier(value, 'Method name');
@@ -125,36 +117,11 @@ async function formatFilesWithPrettier(
   projectRoot: string,
   filePaths: string[],
 ): Promise<void> {
-  const uniquePaths = [...new Set(filePaths)].filter((filePath) => filePath.endsWith('.ts'));
-  if (uniquePaths.length === 0) {
+  const prettier = loadPrettierFromProject(projectRoot);
+  if (!prettier) {
     return;
   }
-
-  let prettier: PrettierModule | null = null;
-  try {
-    const requireFromProject = createRequire(path.join(projectRoot, 'package.json'));
-    prettier = requireFromProject('prettier') as PrettierModule;
-  } catch {
-    return;
-  }
-
-  await Promise.all(uniquePaths.map(async (filePath) => {
-    const fileInfo = await prettier!.getFileInfo(filePath);
-    if (fileInfo.ignored || !fileInfo.inferredParser) {
-      return;
-    }
-
-    const source = await fs.readFile(filePath, 'utf8');
-    const config = await prettier!.resolveConfig(filePath);
-    const formatted = await prettier!.format(source, {
-      ...config,
-      filepath: filePath,
-    });
-
-    if (formatted !== source) {
-      await fs.writeFile(filePath, formatted);
-    }
-  }));
+  await formatFiles(filePaths, prettier);
 }
 
 export async function generateMethodCommand(
@@ -181,15 +148,7 @@ export async function generateMethodCommand(
     options?.moduleVersion,
   );
 
-  if (moduleVersion && !config.moduleVersions.includes(moduleVersion)) {
-    config = {
-      ...config,
-      moduleVersioning: true,
-      moduleVersions: [...config.moduleVersions, moduleVersion].sort(),
-      defaultModuleVersion: config.defaultModuleVersion || moduleVersion,
-    };
-    await writeConfig(projectRoot, config);
-  }
+  config = await ensureModuleVersion(projectRoot, config, moduleVersion);
 
   const paths = buildPaths(projectRoot, config, moduleVersion, naming);
   if (!(await fs.pathExists(paths.moduleDir))) {

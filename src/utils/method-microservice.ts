@@ -9,6 +9,9 @@ import {
   relativeImport,
 } from './source-file-utils';
 import type { ModuleNaming } from '../types';
+import {
+  buildFieldTsType,
+} from './method-shared';
 import type {
   EntityFieldInfo,
   MethodContextLike,
@@ -35,10 +38,6 @@ function buildMicroDtoFileBase(requestName: string): string {
 
 function buildMicroDtoClassName(requestName: string): string {
   return `${requestName}Dto`;
-}
-
-function buildFieldTsType(type: EntityFieldInfo['type']): string {
-  return type;
 }
 
 function buildProtoFieldType(type: string): string {

@@ -6,7 +6,7 @@ export function toPascalCase(value: string): string {
     .replace(/^(.)/, (char) => char.toUpperCase());
 }
 
-function toCamelCase(value: string): string {
+export function toCamelCase(value: string): string {
   const pascal = toPascalCase(value);
   return pascal.charAt(0).toLowerCase() + pascal.slice(1);
 }

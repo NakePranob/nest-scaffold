@@ -11,6 +11,17 @@ import {
 } from './commands/generate';
 import { generateMethodCommand } from './commands/method';
 
+function wrapCommand<T extends (...args: any[]) => Promise<void>>(fn: T): T {
+  return (async (...args: any[]) => {
+    try {
+      await fn(...args);
+    } catch (error) {
+      console.error(pc.red(`\n✗ ${(error as Error).message}\n`));
+      process.exit(1);
+    }
+  }) as T;
+}
+
 async function promptName(type: string): Promise<string> {
   return input({
     message: `${type} name (e.g. orders, order):`,
@@ -32,51 +43,41 @@ program
   .option('--defaults', 'use default options without wizard (for CI)')
   .option('--architecture <type>', 'default architecture: monolith or microservice')
   .description('Create a new NestJS project with interactive wizard')
-  .action(async (
+  .action(wrapCommand(async (
     projectName?: string,
     options?: { defaults?: boolean; architecture?: 'monolith' | 'microservice' },
   ) => {
-    try {
-      await createCommand(projectName, options);
-    } catch (error) {
-      console.error(pc.red(`\n✗ ${(error as Error).message}\n`));
-      process.exit(1);
-    }
-  });
+    await createCommand(projectName, options);
+  }));
 
 const generate = program
   .command('generate')
   .alias('g')
   .description('Generate code in an existing project')
-  .action(async () => {
-    try {
-      const type = await select({
-        message: 'What do you want to generate?',
-        choices: [
-          { name: 'Module (with full CRUD or minimal)', value: 'module' },
-          { name: 'Service (standalone)', value: 'service' },
-          { name: 'Controller (standalone)', value: 'controller' },
-          { name: 'Method (add to existing module)', value: 'method' },
-        ],
-      });
+  .action(wrapCommand(async () => {
+    const type = await select({
+      message: 'What do you want to generate?',
+      choices: [
+        { name: 'Module (with full CRUD or minimal)', value: 'module' },
+        { name: 'Service (standalone)', value: 'service' },
+        { name: 'Controller (standalone)', value: 'controller' },
+        { name: 'Method (add to existing module)', value: 'method' },
+      ],
+    });
 
-      if (type === 'module') {
-        const name = await promptName(type);
-        await generateModuleCommand(name);
-      } else if (type === 'service') {
-        const name = await promptName(type);
-        await generateServiceCommand(name);
-      } else if (type === 'controller') {
-        const name = await promptName(type);
-        await generateControllerCommand(name);
-      } else {
-        await generateMethodCommand();
-      }
-    } catch (error) {
-      console.error(pc.red(`\n✗ ${(error as Error).message}\n`));
-      process.exit(1);
+    if (type === 'module') {
+      const name = await promptName(type);
+      await generateModuleCommand(name);
+    } else if (type === 'service') {
+      const name = await promptName(type);
+      await generateServiceCommand(name);
+    } else if (type === 'controller') {
+      const name = await promptName(type);
+      await generateControllerCommand(name);
+    } else {
+      await generateMethodCommand();
     }
-  });
+  }));
 
 generate
   .command('module')
@@ -88,19 +89,14 @@ generate
   )
   .option('--full', 'generate full CRUD with entity (controller + service + DTOs)')
   .description('Generate a feature module (alias: m)')
-  .action(
+  .action(wrapCommand(
     async (
       name: string | undefined,
       options?: { moduleVersion?: string; full?: boolean },
     ) => {
-      try {
-        await generateModuleCommand(name || await promptName('module'), options);
-      } catch (error) {
-        console.error(pc.red(`\n✗ ${(error as Error).message}\n`));
-        process.exit(1);
-      }
+      await generateModuleCommand(name || await promptName('module'), options);
     },
-  );
+  ));
 
 generate
   .command('service')
@@ -111,16 +107,11 @@ generate
     'target version folder (e.g. v1) — skips prompt when project uses versioning',
   )
   .description('Generate a standalone service (alias: s)')
-  .action(
+  .action(wrapCommand(
     async (name: string | undefined, options?: { moduleVersion?: string }) => {
-      try {
-        await generateServiceCommand(name || await promptName('service'), options);
-      } catch (error) {
-        console.error(pc.red(`\n✗ ${(error as Error).message}\n`));
-        process.exit(1);
-      }
+      await generateServiceCommand(name || await promptName('service'), options);
     },
-  );
+  ));
 
 generate
   .command('controller')
@@ -131,16 +122,11 @@ generate
     'target version folder (e.g. v1) — skips prompt when project uses versioning',
   )
   .description('Generate a standalone controller (alias: c)')
-  .action(
+  .action(wrapCommand(
     async (name: string | undefined, options?: { moduleVersion?: string }) => {
-      try {
-        await generateControllerCommand(name || await promptName('controller'), options);
-      } catch (error) {
-        console.error(pc.red(`\n✗ ${(error as Error).message}\n`));
-        process.exit(1);
-      }
+      await generateControllerCommand(name || await promptName('controller'), options);
     },
-  );
+  ));
 
 generate
   .command('method')
@@ -155,7 +141,7 @@ generate
   .option('--get-mode <mode>', 'for GET only: all or one; monolith routes and microservice RPCs adapt to this')
   .option('--field <name>', 'for GET one: lookup field such as email, slug, username')
   .description('Add a method to an existing module controller + service / gRPC handler (alias: me)')
-  .action(
+  .action(wrapCommand(
     async (
       moduleName: string | undefined,
       methodName: string | undefined,
@@ -166,13 +152,8 @@ generate
         field?: string;
       },
     ) => {
-      try {
-        await generateMethodCommand(moduleName, methodName, options);
-      } catch (error) {
-        console.error(pc.red(`\n✗ ${(error as Error).message}\n`));
-        process.exit(1);
-      }
+      await generateMethodCommand(moduleName, methodName, options);
     },
-  );
+  ));
 
 program.parse();

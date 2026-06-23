@@ -86,14 +86,10 @@ export async function detectModuleVersioning(projectRoot: string): Promise<{
     };
   }
 
-  const flatAuth = await fs.pathExists(
-    path.join(projectRoot, 'src', 'modules', 'auth', 'auth.module.ts'),
-  );
-
   return {
     moduleVersioning: false,
     defaultModuleVersion: '',
-    moduleVersions: flatAuth ? [] : [],
+    moduleVersions: [],
   };
 }
 

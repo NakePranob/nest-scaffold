@@ -1,5 +1,4 @@
 import path from 'node:path';
-import { createRequire } from 'node:module';
 import fs from 'fs-extra';
 import pc from 'picocolors';
 import { promptProjectName, runCreateWizard } from '../prompts/create-wizard';
@@ -10,12 +9,11 @@ import {
   buildTemplateContext,
 } from '../utils/template-renderer';
 import { getCreateTemplateEntries } from '../templates/create-manifest';
-
-interface PrettierModule {
-  resolveConfig(filePath: string): Promise<Record<string, unknown> | null>;
-  getFileInfo(filePath: string): Promise<{ ignored: boolean; inferredParser?: string | null }>;
-  format(source: string, options: Record<string, unknown>): Promise<string>;
-}
+import {
+  loadPrettierFromCLI,
+  formatFileWithPrettier,
+  FORMATTABLE_EXTENSIONS,
+} from '../utils/prettier-formatter';
 
 function normalizeArchitecture(
   value?: string,
@@ -28,16 +26,6 @@ function normalizeArchitecture(
   }
   return value;
 }
-
-const FORMATTABLE_EXTENSIONS = new Set([
-  '.ts',
-  '.js',
-  '.mjs',
-  '.json',
-  '.md',
-  '.yml',
-  '.yaml',
-]);
 
 async function listFormattableFiles(rootDir: string): Promise<string[]> {
   const files: string[] = [];
@@ -66,26 +54,10 @@ async function listFormattableFiles(rootDir: string): Promise<string[]> {
 }
 
 async function formatProjectWithPrettier(projectRoot: string): Promise<void> {
-  const requireFromCli = createRequire(path.join(__dirname, '..', '..', 'package.json'));
-  const prettier = requireFromCli('prettier') as PrettierModule;
+  const prettier = loadPrettierFromCLI();
   const filePaths = await listFormattableFiles(projectRoot);
-
   await Promise.all(filePaths.map(async (filePath) => {
-    const fileInfo = await prettier.getFileInfo(filePath);
-    if (fileInfo.ignored || !fileInfo.inferredParser) {
-      return;
-    }
-
-    const source = await fs.readFile(filePath, 'utf8');
-    const config = await prettier.resolveConfig(filePath);
-    const formatted = await prettier.format(source, {
-      ...config,
-      filepath: filePath,
-    });
-
-    if (formatted !== source) {
-      await fs.writeFile(filePath, formatted);
-    }
+    await formatFileWithPrettier(filePath, prettier);
   }));
 }
 

@@ -1,7 +1,7 @@
 import { input, select } from '@inquirer/prompts';
 import { promptMethodName } from '../prompts/generate-wizard';
 import { normalizeIdentifier } from './identifiers';
-import { toPascalCase } from './naming';
+import { toPascalCase, toCamelCase } from './naming';
 import { buildMicroserviceRpcName, buildMicroserviceRpcNameFromMethodName } from './method-microservice';
 import { getPrimaryClass, hasMethod } from './source-file-utils';
 import {
@@ -18,9 +18,6 @@ import type {
 } from '../types';
 import type { SourceFile } from 'ts-morph';
 
-function toCamelCase(value: string): string {
-  return value.charAt(0).toLowerCase() + value.slice(1);
-}
 
 function buildFieldSuffix(fieldName: string): string {
   if (fieldName === 'id') {

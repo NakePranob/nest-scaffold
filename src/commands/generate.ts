@@ -1,8 +1,7 @@
 import path from 'node:path';
 import fs from 'fs-extra';
 import pc from 'picocolors';
-import { readConfig, writeConfig } from '../utils/config';
-import { detectConfig } from '../utils/detector';
+import { readConfig, writeConfig, resolveProjectConfig, ensureModuleVersion } from '../utils/config';
 import { resolveModuleNaming } from '../utils/naming';
 import {
   applyTemplateEntries,
@@ -22,10 +21,6 @@ import {
   moduleImportPath,
 } from '../utils/module-paths';
 
-async function resolveProjectConfig(projectRoot: string) {
-  return (await readConfig(projectRoot)) ?? (await detectConfig(projectRoot));
-}
-
 export async function generateServiceCommand(
   name: string,
   options?: { moduleVersion?: string },
@@ -40,15 +35,7 @@ export async function generateServiceCommand(
     options?.moduleVersion,
   );
 
-  if (moduleVersion && !config.moduleVersions.includes(moduleVersion)) {
-    config = {
-      ...config,
-      moduleVersioning: true,
-      moduleVersions: [...config.moduleVersions, moduleVersion].sort(),
-      defaultModuleVersion: config.defaultModuleVersion || moduleVersion,
-    };
-    await writeConfig(projectRoot, config);
-  }
+  config = await ensureModuleVersion(projectRoot, config, moduleVersion);
 
   const moduleDir = path.join(
     projectRoot,
@@ -128,15 +115,7 @@ export async function generateControllerCommand(
     options?.moduleVersion,
   );
 
-  if (moduleVersion && !config.moduleVersions.includes(moduleVersion)) {
-    config = {
-      ...config,
-      moduleVersioning: true,
-      moduleVersions: [...config.moduleVersions, moduleVersion].sort(),
-      defaultModuleVersion: config.defaultModuleVersion || moduleVersion,
-    };
-    await writeConfig(projectRoot, config);
-  }
+  config = await ensureModuleVersion(projectRoot, config, moduleVersion);
 
   const moduleDir = path.join(
     projectRoot,
@@ -221,22 +200,14 @@ export async function generateModuleCommand(
   const projectRoot = process.cwd();
   const naming = resolveModuleNaming(name);
 
-  let config = (await readConfig(projectRoot)) ?? (await detectConfig(projectRoot));
+  let config = await resolveProjectConfig(projectRoot);
   const moduleVersion = await promptModuleVersion(
     projectRoot,
     config,
     options?.moduleVersion,
   );
 
-  if (moduleVersion && !config.moduleVersions.includes(moduleVersion)) {
-    config = {
-      ...config,
-      moduleVersioning: true,
-      moduleVersions: [...config.moduleVersions, moduleVersion].sort(),
-      defaultModuleVersion: config.defaultModuleVersion || moduleVersion,
-    };
-    await writeConfig(projectRoot, config);
-  }
+  config = await ensureModuleVersion(projectRoot, config, moduleVersion);
 
   const moduleDir = path.join(
     projectRoot,
