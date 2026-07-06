@@ -3,8 +3,14 @@ import { GrpcMethod } from '@nestjs/microservices';
 
 @Controller()
 export class HealthController {
-  @GrpcMethod('HealthService', 'Check')
-  check(data: unknown): { status: string } {
-    return { status: 'SERVING' };
+  @GrpcMethod('Health', 'Check')
+  check(data: { service: string }): { status: number } {
+    // Return SERVING (1) for all services by default
+    // Return NOT_SERVING (2) here if a dependency check fails
+    const unknownServices: string[] = [];
+    if (unknownServices.includes(data.service)) {
+      return { status: 3 }; // SERVICE_UNKNOWN
+    }
+    return { status: 1 }; // SERVING
   }
 }

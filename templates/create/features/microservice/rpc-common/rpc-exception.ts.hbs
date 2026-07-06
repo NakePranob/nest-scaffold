@@ -1,5 +1,5 @@
-import { RpcException } from '@nestjs/microservices';
-import { RpcErrorDescriptor } from '../errors/rpc-error-catalog';
+import { RpcException } from "@nestjs/microservices";
+import { RpcErrorDescriptor } from "../errors/rpc-error-catalog";
 
 export type RpcFieldError = {
   field: string;
@@ -7,7 +7,7 @@ export type RpcFieldError = {
 };
 
 type RpcExceptionPayload = {
-  code: string;
+  code: number;
   message: string;
   details?: RpcFieldError[] | null;
 };
@@ -23,3 +23,4 @@ export function createRpcException(
   };
   return new RpcException(payload);
 }
+

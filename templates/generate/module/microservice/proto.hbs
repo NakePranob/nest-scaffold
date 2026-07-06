@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package {{protoPackage}};
+package {{protoPackage}}{{#if moduleVersion}}.{{moduleVersion}}{{/if}};
 
 // Use-case oriented RPC definitions — one RPC per business action
 service {{pascalName}}Service {

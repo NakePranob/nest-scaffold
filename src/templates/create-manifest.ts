@@ -48,6 +48,11 @@ export function getCreateTemplateEntries(): TemplateEntry[] {
       output: (ctx) => `src/proto/${ctx.projectName}.proto`,
       when: (c) => c.architecture === 'microservice',
     },
+    {
+      template: 'create/base/src/microservice/health.proto.hbs',
+      output: 'src/proto/health.proto',
+      when: (c) => c.architecture === 'microservice',
+    },
 
     // Monolith — HTTP response envelope
     {
@@ -151,7 +156,7 @@ export function getCreateTemplateEntries(): TemplateEntry[] {
     {
       template: 'create/features/auth/jwt-auth.guard.ts.hbs',
       output: 'src/common/guards/jwt-auth.guard.ts',
-      when: (c) => c.auth,
+      when: (c) => c.auth && c.architecture === 'monolith',
     },
     {
       template: 'create/features/auth/current-user.decorator.ts.hbs',
@@ -167,6 +172,13 @@ export function getCreateTemplateEntries(): TemplateEntry[] {
       template: 'create/features/auth/database-error.ts.hbs',
       output: 'src/common/helpers/database-error.ts',
       when: (c) => c.typeorm,
+    },
+
+    // Microservice — gRPC auth interceptor
+    {
+      template: 'create/features/microservice/auth/grpc-auth.interceptor.ts.hbs',
+      output: 'src/common/interceptors/grpc-auth.interceptor.ts',
+      when: (c) => c.auth && c.architecture === 'microservice',
     },
 
     // Auth module
@@ -201,7 +213,7 @@ export function getCreateTemplateEntries(): TemplateEntry[] {
     {
       template: 'create/features/auth/jwt.strategy.ts.hbs',
       output: featurePath('auth', 'strategies', 'jwt.strategy.ts'),
-      when: (c) => c.auth,
+      when: (c) => c.auth && c.architecture === 'monolith',
     },
     {
       template: 'create/features/auth/login.dto.ts.hbs',
@@ -216,7 +228,7 @@ export function getCreateTemplateEntries(): TemplateEntry[] {
     {
       template: 'create/features/auth/auth-error-catalog.ts.hbs',
       output: featurePath('auth', 'auth-error-catalog.ts'),
-      when: (c) => c.auth && c.responseEnvelope,
+      when: (c) => c.auth && c.architecture === 'monolith',
     },
     {
       template: 'create/features/auth/auth-swagger.decorator.ts.hbs',

@@ -1,17 +1,29 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
+{{#if isMonolith}}
 import { PassportModule } from '@nestjs/passport';
+{{/if}}
+{{#if isMicroservice}}
+import { APP_INTERCEPTOR } from '@nestjs/core';
+{{/if}}
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthController } from './auth.controller{{#if isMicroservice}}.grpc{{/if}}';
 import { AuthService } from './auth.service';
+{{#if isMonolith}}
 import { JwtStrategy } from './strategies/jwt.strategy';
+{{/if}}
+{{#if isMicroservice}}
+import { GrpcAuthInterceptor } from '{{commonFromModule}}/interceptors/grpc-auth.interceptor';
+{{/if}}
 import { User } from '../users/entities/user.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User]),
+{{#if isMonolith}}
     PassportModule.register({ defaultStrategy: 'jwt' }),
+{{/if}}
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -22,7 +34,26 @@ import { User } from '../users/entities/user.entity';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy],
-  exports: [JwtStrategy, PassportModule],
+  providers: [
+    AuthService,
+{{#if isMonolith}}
+    JwtStrategy,
+{{/if}}
+{{#if isMicroservice}}
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: GrpcAuthInterceptor,
+    },
+{{/if}}
+  ],
+  exports: [
+{{#if isMonolith}}
+    JwtStrategy,
+    PassportModule,
+{{/if}}
+{{#if isMicroservice}}
+    GrpcAuthInterceptor,
+{{/if}}
+  ],
 })
 export class AuthModule {}

@@ -1,10 +1,11 @@
-import { ArgumentsHost, Catch, RpcExceptionFilter } from '@nestjs/common';
-import { RpcException } from '@nestjs/microservices';
-import { Observable, throwError } from 'rxjs';
-import { RPC_ERRORS } from '../errors/rpc-error-catalog';
+import { ArgumentsHost, Catch, RpcExceptionFilter } from "@nestjs/common";
+import { RpcException } from "@nestjs/microservices";
+import { status } from "@grpc/grpc-js";
+import { Observable, throwError } from "rxjs";
+import { RPC_ERRORS } from "../errors/rpc-error-catalog";
 
 type RpcErrorPayload = {
-  code: string;
+  code: number;
   message: string;
   details?: unknown;
 };
@@ -22,7 +23,7 @@ export class RpcExceptionsFilter
       code: RPC_ERRORS.INTERNAL_ERROR.code,
       message: RPC_ERRORS.INTERNAL_ERROR.message,
       details:
-        process.env.NODE_ENV === 'production'
+        process.env.NODE_ENV === "production"
           ? null
           : exception instanceof Error
             ? { name: exception.name, message: exception.message }
@@ -32,3 +33,4 @@ export class RpcExceptionsFilter
     return throwError(() => payload);
   }
 }
+

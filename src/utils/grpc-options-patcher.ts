@@ -90,8 +90,11 @@ export async function registerModuleGrpcProto(
   naming: { name: string; fileBase: string },
   options: { infraLayer?: boolean } = {},
 ): Promise<void> {
+  const protoPackage = moduleVersion
+    ? `${toProtoPackage(naming.name)}.${moduleVersion}`
+    : toProtoPackage(naming.name);
   await registerGrpcProtoInOptions(projectRoot, {
-    protoPackage: toProtoPackage(naming.name),
+    protoPackage,
     protoPathSegments: buildModuleProtoPathSegments(
       config.moduleVersioning,
       moduleVersion,

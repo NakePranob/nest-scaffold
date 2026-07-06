@@ -1,45 +1,38 @@
-export enum RpcErrorCode {
-  InternalError = 'INTERNAL_ERROR',
-  ValidationError = 'VALIDATION_ERROR',
-  Unauthorized = 'UNAUTHORIZED',
-  Forbidden = 'FORBIDDEN',
-  NotFound = 'NOT_FOUND',
-  Conflict = 'CONFLICT',
-  InvalidArgument = 'INVALID_ARGUMENT',
-}
+import { status } from "@grpc/grpc-js";
 
 export type RpcErrorDescriptor = {
-  code: RpcErrorCode;
+  code: number;
   message: string;
 };
 
 export const RPC_ERRORS = {
   INTERNAL_ERROR: {
-    code: RpcErrorCode.InternalError,
-    message: 'Internal service error',
+    code: status.INTERNAL,
+    message: "Internal service error",
   },
   VALIDATION_ERROR: {
-    code: RpcErrorCode.ValidationError,
-    message: 'Validation failed',
+    code: status.INVALID_ARGUMENT,
+    message: "Validation failed",
   },
   UNAUTHORIZED: {
-    code: RpcErrorCode.Unauthorized,
-    message: 'Unauthorized',
+    code: status.UNAUTHENTICATED,
+    message: "Unauthorized",
   },
   FORBIDDEN: {
-    code: RpcErrorCode.Forbidden,
-    message: 'Forbidden',
+    code: status.PERMISSION_DENIED,
+    message: "Forbidden",
   },
   NOT_FOUND: {
-    code: RpcErrorCode.NotFound,
-    message: 'Resource not found',
+    code: status.NOT_FOUND,
+    message: "Resource not found",
   },
   CONFLICT: {
-    code: RpcErrorCode.Conflict,
-    message: 'Conflict',
+    code: status.ALREADY_EXISTS,
+    message: "Conflict",
   },
   INVALID_ARGUMENT: {
-    code: RpcErrorCode.InvalidArgument,
-    message: 'Invalid argument',
+    code: status.INVALID_ARGUMENT,
+    message: "Invalid argument",
   },
 } as const satisfies Record<string, RpcErrorDescriptor>;
+

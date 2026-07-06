@@ -33,13 +33,13 @@ const STEPS: WizardStep[] = [
     key: 'usersModule',
     message: 'Include example Users module (CRUD)?',
     default: true,
-    when: (_, arch) => arch === 'monolith',
+    when: () => true,
   },
   {
     key: 'auth',
     message: 'Include Auth module (JWT)?',
     default: false,
-    when: (a, arch) => a.usersModule && arch === 'monolith',
+    when: (a) => a.usersModule,
   },
   {
     key: 'seeds',
@@ -51,7 +51,7 @@ const STEPS: WizardStep[] = [
     key: 'moduleVersioning',
     message: 'Organize modules under version folder (e.g. v1)?',
     default: false,
-    when: (_, arch) => arch === 'monolith',
+    when: () => true,
   },
   {
     key: 'e2e',
@@ -124,11 +124,9 @@ export async function runCreateWizard(
   if (config.architecture === 'monolith') {
     console.log(`  Swagger: ${config.swagger ? 'yes' : 'no'}`);
   }
-  if (config.architecture === 'monolith') {
-    console.log(`  Users module: ${config.usersModule ? 'yes' : 'no'}`);
-    console.log(`  Auth: ${config.auth ? 'yes' : 'no'}`);
-    console.log(`  Seeds: ${config.seeds ? 'yes' : 'no'}`);
-  }
+  console.log(`  Users module: ${config.usersModule ? 'yes' : 'no'}`);
+  console.log(`  Auth: ${config.auth ? 'yes' : 'no'}`);
+  console.log(`  Seeds: ${config.seeds ? 'yes' : 'no'}`);
   console.log(`  Version folder: ${config.moduleVersioning ? config.defaultModuleVersion : 'no'}`);
   console.log(`  E2E tests: ${config.e2e ? 'yes' : 'no'}`);
   console.log(`  Architecture docs: ${config.docs ? 'yes' : 'no'}`);
