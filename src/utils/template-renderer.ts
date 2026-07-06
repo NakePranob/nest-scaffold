@@ -2,6 +2,7 @@ import path from 'node:path';
 import nodeFs from 'node:fs';
 import fs from 'fs-extra';
 import Handlebars from 'handlebars';
+import pkg from '../../package.json';
 import { ScaffoldConfig, TemplateContext, ModuleNaming } from '../types';
 import { STACK_LABEL, STACK_VERSIONS } from '../stack-versions';
 import { resolveModuleNaming } from './naming';
@@ -65,6 +66,7 @@ export function buildTemplateContext(
     isMonolith: config.architecture === 'monolith',
     isMicroservice: config.architecture === 'microservice',
     protoPackage,
+    cliVersion: pkg.version,
   };
 }
 
