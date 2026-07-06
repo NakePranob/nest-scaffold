@@ -69,18 +69,25 @@ consistent across the application
 ## 5. Module Versioning
 
 {{#if isMicroservice}}
-**Decision:** Proto package versioning (no folder versioning)
-**Rationale:** gRPC microservices versioning is managed through `.proto` package
-names, not folder paths
-- Version is encoded in `.proto` package: `package orders.v1;`
-- All modules live in `src/modules/<feature>` without version subfolders
+**Decision:** Folder-based module versioning + proto package versioning, together
+**Rationale:** gRPC microservices support the same optional folder versioning as
+monoliths, and the `.proto` package name is kept in sync with the folder version
+- When enabled: modules are organized under `src/modules/v1/`, `v2/`, etc.,
+  exactly like a monolith
+- When disabled: modules live directly in `src/modules/<feature>` without
+  version subfolders
+- Independently, each module's `.proto` package name reflects its version:
+  `package orders.v1;` (namespacing handled by
+  `src/utils/grpc-options-patcher.ts`)
+- Use `nest-scaffold generate module <name> --module-version v2` to target (or
+  create) a specific version folder — the same flag as monolith projects
 {{else}}
 **Decision:** Optional folder-based module versioning
 **Rationale:** API versioning can be managed through folder hierarchies
 (e.g. `src/modules/v1/orders`)
 - When enabled: modules are organized under `v1/`, `v2/`, etc.
 - When disabled: modules live directly in `src/modules/`
-- Use `nest-scaffold generate module <name> --moduleVersion v2` to add to a
+- Use `nest-scaffold generate module <name> --module-version v2` to add to a
   specific version
 {{/if}}
 

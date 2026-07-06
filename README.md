@@ -81,12 +81,12 @@ Without `--defaults`, an interactive wizard asks:
 |---|---|
 | Swagger | `src/common/swagger/*`, `@nestjs/swagger` setup, response DTO decorators (monolith only) |
 | Docker + PostgreSQL | `docker-compose.yml` wired to the TypeORM connection |
-| Users module (CRUD) | `src/modules/users/*` — entity, DTOs, controller, service, tests |
-| Auth (JWT) | `src/modules/auth/*` — login/register, `JwtStrategy` + guard (monolith) or gRPC auth interceptor (microservice) |
+| Users module (CRUD) | `src/modules/users/*` — entity, DTOs, controller, service, tests (monolith only) |
+| Auth (JWT) | `src/modules/auth/*` — login/register, `JwtStrategy` + guard (monolith only) |
 | Database seeds | `src/database/seed.ts` (+ a users seed if Users module is enabled) |
 | E2E scaffold | `test/app.e2e-spec.ts` + Jest e2e config |
 | Architecture docs | `docs/architect/architecture.md`, `patterns.md`, `techstack.md` — describe the actual choices you made |
-| Module versioning | organizes future modules under `src/modules/v1/` |
+| Module versioning | organizes future modules under `src/modules/v1/` (monolith and microservice) |
 
 Response envelope (interceptor + filter) is always included for a monolith and
 never for a microservice. Pagination helpers and TypeORM/PostgreSQL are always
@@ -215,7 +215,7 @@ flat one, so gRPC adapters stay separate from business logic:
 
 ```text
 src/
-├── common/                      # rpc error catalog, rpc exception filter, grpc auth interceptor
+├── common/                      # rpc error catalog, rpc exception filter
 ├── grpc/grpc.options.ts         # registered proto packages + paths
 ├── proto/{{projectName}}.proto  # project-level proto, plus health.proto
 ├── health.controller.ts         # standard grpc.health.v1.Health service
