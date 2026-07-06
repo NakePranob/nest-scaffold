@@ -16,10 +16,6 @@ export async function promptModuleVersion(
   config: ScaffoldConfig,
   preset?: string,
 ): Promise<string> {
-  if (config.architecture === 'microservice') {
-    return '';
-  }
-
   const versions = await listModuleVersions(projectRoot);
   const versioned = config.moduleVersioning || versions.length > 0;
 

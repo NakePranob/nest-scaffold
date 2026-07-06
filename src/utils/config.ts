@@ -64,9 +64,6 @@ export function enforceDependencies(
     next.usersModule = false;
     next.auth = false;
     next.seeds = false;
-    next.moduleVersioning = false;
-    next.defaultModuleVersion = '';
-    next.moduleVersions = [];
   }
 
   if (!next.usersModule) {
