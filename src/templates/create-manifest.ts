@@ -27,6 +27,20 @@ export function getCreateTemplateEntries(): TemplateEntry[] {
     { template: 'create/base/.env.example.hbs', output: '.env.example', when: always },
     { template: 'create/base/README.md.hbs', output: 'README.md', when: always },
 
+    // Agent guidance
+    { template: 'create/base/AGENTS.md.hbs', output: 'AGENTS.md', when: always },
+    { template: 'create/base/CLAUDE.md.hbs', output: 'CLAUDE.md', when: always },
+    {
+      template: 'create/base/.claude/skills/nest-scaffold/SKILL.md.hbs',
+      output: '.claude/skills/nest-scaffold/SKILL.md',
+      when: always,
+    },
+    {
+      template: 'create/base/.agents/skills/nest-scaffold.md.hbs',
+      output: '.agents/skills/nest-scaffold.md',
+      when: always,
+    },
+
     // App source (shared)
     { template: 'create/base/src/main.ts.hbs', output: 'src/main.ts', when: always },
     { template: 'create/base/src/app.module.ts.hbs', output: 'src/app.module.ts', when: always },

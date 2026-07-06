@@ -1,0 +1,55 @@
+---
+name: nest-scaffold
+description: >
+  Use whenever the user asks to add, create, scaffold, wire up, or generate a
+  new NestJS module, feature, resource, service, controller{{#if isMicroservice}}, gRPC
+  handler, RPC, or proto method{{else}}, route, or endpoint{{/if}} in THIS
+  project — including indirect or paraphrased requests that imply new backend
+  surface area without saying "module" or "method" literally, e.g. "add a way
+  to reset passwords", "let admins approve orders", "we need an endpoint for
+  X", "expose Y over the API", "add a products feature". This project was
+  scaffolded by nest-scaffold and has a nest-scaffold.config.json at its root
+  — check for that file before assuming this applies. Do NOT use for:
+  business logic inside an already-generated method body, entity or DTO
+  field edits, validation rule changes, bug fixes, refactors of existing
+  code, or any project that lacks nest-scaffold.config.json at its root.
+---
+
+# nest-scaffold
+
+This project's modules, services, controllers{{#if isMicroservice}}, and RPC
+methods{{else}}, and routes{{/if}} are generated with the `nest-scaffold`
+CLI — do not hand-write new ones. Hand-writing a new
+module/controller/service, or adding a method by editing the
+controller/service directly, produces a shape that doesn't match the rest of
+the codebase (missing `AppModule` registration{{#if isMicroservice}}, missing
+`.proto` sync{{/if}}, inconsistent error-catalog wiring, etc.).
+
+## When to use this skill
+
+- Any request for a new feature/resource/module, even named informally
+  ("add invoices", "we need a way to track X")
+- Any request for a new {{#if isMicroservice}}RPC/{{/if}}endpoint on an
+  existing feature, even phrased as a capability ("let users do X", "admins
+  should be able to Y")
+- The user explicitly says "generate", "scaffold", or names the CLI
+
+## When NOT to use this skill
+
+- Filling in business logic inside a method the CLI already generated
+- Editing entity fields, DTO validation, or existing method bodies
+- Bug fixes and refactors
+- The project has no `nest-scaffold.config.json` at its root
+
+## How to use it
+
+Read `.agents/skills/nest-scaffold.md` for full command syntax, flags, and
+worked examples for `generate module/service/controller/method` before
+running anything — do not guess flags.
+
+Quick shape, always run from the project root:
+
+```bash
+npx nest-scaffold generate module <name> --full
+npx nest-scaffold generate method <module> <methodName> --type <get|post|put|patch|delete>
+```

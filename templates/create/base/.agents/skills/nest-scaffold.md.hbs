@@ -1,0 +1,69 @@
+# nest-scaffold command reference
+
+This project already exists — you will only ever run `generate` subcommands
+here, never `create`. All commands run from the project root via the local
+devDependency:
+
+```bash
+npx nest-scaffold generate module <name> --full
+npx nest-scaffold g m <name> --full          # alias
+```
+
+## generate module (alias m)
+
+```bash
+npx nest-scaffold generate module orders --full
+{{#if moduleVersioning}}npx nest-scaffold g m orders --full --module-version v2
+{{/if}}```
+
+| Option | Effect |
+|---|---|
+| `--full` | Full CRUD: controller + service + DTOs + entity |
+{{#if moduleVersioning}}| `--module-version <v>` | Target a specific version folder (this project has versioning enabled: {{moduleVersions}}) |
+{{/if}}
+
+Without `--full`, only a minimal module class is created.{{#if isMicroservice}} A
+`--full` module on this microservice project also creates and registers a
+`.proto` file automatically.{{/if}}
+
+## generate service / generate controller (aliases s / c)
+
+```bash
+npx nest-scaffold g s orders
+npx nest-scaffold g c orders
+```
+
+Adds a standalone service or controller to a module missing one.{{#if isMicroservice}}
+On this microservice project, `generate controller` also creates the
+module's `.proto` file and registers its gRPC package.{{/if}}
+
+## generate method (alias me) — the command you'll use most
+
+```bash
+{{#if isMicroservice}}npx nest-scaffold g me orders approve --type patch
+npx nest-scaffold g me orders findByStatus --type get --get-mode all
+{{else}}npx nest-scaffold g me users findByEmail --type get --get-mode one --field email
+npx nest-scaffold g me users findAllActive --type get --get-mode all
+npx nest-scaffold g me orders approve --type patch
+{{/if}}```
+
+| Option | Effect |
+|---|---|
+| `--type <get\|post\|put\|patch\|delete>` | {{#if isMicroservice}}RPC shape{{else}}HTTP verb{{/if}} |
+| `--get-mode <all\|one>` | For `get` only — list vs. single-record lookup |
+| `--field <name>` | For `get --get-mode one` — lookup field (e.g. `email`, `slug`) |
+{{#if moduleVersioning}}| `--module-version <v>` | Target a specific version folder |
+{{/if}}
+
+Patches the existing controller + service{{#if isMicroservice}} + `.proto`{{/if}}
+in place. Leaves the method body as a TODO-style stub — it scaffolds shape,
+not your domain logic. Never overwrites a method with the same name in
+place; if the name collides it asks for a different one instead.
+
+## Config
+
+This project's `nest-scaffold.config.json` records architecture
+(`{{architecture}}`){{#if moduleVersioning}}, module versioning (enabled,
+default `{{defaultModuleVersion}}`){{else}}, module versioning
+(disabled){{/if}}, and enabled features. `generate` reads it automatically —
+you never need to repeat flags it can infer.

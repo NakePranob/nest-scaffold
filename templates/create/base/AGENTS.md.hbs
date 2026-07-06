@@ -1,0 +1,68 @@
+# Agent Guidance: {{projectName}}
+
+This project was scaffolded by `@nakedev/nest-scaffold` (`{{cliVersion}}`) and is
+maintained using its `generate` subcommands — new modules, services,
+controllers, and {{#if isMicroservice}}RPC methods{{else}}endpoints{{/if}} are
+not hand-written.
+
+## Hard rule: use the CLI to add new modules/services/controllers/methods
+
+If you are about to write a **new** NestJS module, service, controller,
+{{#if isMicroservice}}gRPC handler,{{else}}route handler,{{/if}} or add a
+**new** {{#if isMicroservice}}RPC method{{else}}endpoint{{/if}} to an existing
+one — stop and run the CLI instead:
+
+```bash
+npx nest-scaffold generate module <name> --full
+npx nest-scaffold generate method <module> <methodName> --type <get|post|put|patch|delete>
+```
+
+This applies **even when the request doesn't say "module" or "method" or name
+the CLI at all**. Recognize indirect asks as generation work, for example:
+
+- "add a way to reset a user's password" → a new `post` method on the
+  relevant module (`generate method users resetPassword --type post`)
+- "let admins approve orders" → a new method on the orders module
+  (`generate method orders approve --type patch`)
+- "we need an endpoint that lists overdue invoices" → a new `get` method
+  (`generate method invoices findOverdue --type get --get-mode all`)
+- "add a products feature" → a whole new module
+  (`generate module products --full`)
+
+Run `npx nest-scaffold generate --help` (or `g me --help`, `g m --help`) to see
+all flags before hand-writing anything that looks like scaffolding.
+
+## What the CLI does NOT do — these are still done by hand, as normal
+
+- Business logic inside a generated stub (the CLI leaves `TODO`-style bodies —
+  filling them in is your job)
+- Entity field changes (adding/removing/renaming columns, relations)
+- DTO validation rules (`@IsEmail()`, `@Min()`, etc. beyond the generated
+  skeleton)
+- Bug fixes, refactors, or edits to existing logic
+- Anything in a project that does **not** have `nest-scaffold.config.json` at
+  its root — that means the project wasn't scaffolded by this CLI, and this
+  rule does not apply
+
+## Command quick reference
+
+{{#if isMicroservice}}
+- `npx nest-scaffold generate module <name> --full` — layered module
+  (`domain/`, `application/`, `infrastructure/`) with entity, gRPC controller,
+  service, and a registered `.proto` file
+- `npx nest-scaffold generate method <module> <name> --type <get|post|put|patch|delete>` —
+  adds one RPC to an existing module's controller + service + `.proto`
+{{else}}
+- `npx nest-scaffold generate module <name> --full` — controller + service +
+  DTOs + entity, registered in `AppModule`
+- `npx nest-scaffold generate method <module> <name> --type <get|post|put|patch|delete>` —
+  adds one route to an existing module's controller + service
+{{/if}}
+- `npx nest-scaffold generate service <name>` / `generate controller <name>` —
+  add a missing half of a module
+- Full syntax, flags, and per-architecture examples: see
+  `.agents/skills/nest-scaffold.md`
+{{#if docs}}
+- Full architecture rationale for this project's specific configuration: see
+  `docs/architect/`
+{{/if}}
