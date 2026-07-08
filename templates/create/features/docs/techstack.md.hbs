@@ -11,6 +11,7 @@
 | Runtime target | Node.js >= 20 |
 | Framework | NestJS `{{stack.nestCommon}}` |
 {{#if isMonolith}}| HTTP Adapter | Fastify (`@nestjs/platform-fastify` `{{stack.nestPlatformFastify}}`) |
+| Logging | `nestjs-pino` `{{stack.nestjsPino}}` (structured, `NODE_ENV`-aware) |
 {{/if}}{{#if isMicroservice}}| Transport | gRPC (`@nestjs/microservices` `{{stack.nestMicroservices}}`) |
 {{/if}}| Database | PostgreSQL |
 | ORM | TypeORM (`@nestjs/typeorm` `{{stack.nestTypeorm}}`) |
@@ -39,6 +40,7 @@
 | `@nestjs/common` | `{{stack.nestCommon}}` | Core Nest decorators and providers |
 | `@nestjs/core` | `{{stack.nestCore}}` | Nest runtime |
 {{#if isMonolith}}| `@nestjs/platform-fastify` | `{{stack.nestPlatformFastify}}` | Fastify HTTP adapter |
+| `nestjs-pino` | `{{stack.nestjsPino}}` | Structured logging (pretty in dev, NDJSON in production) |
 {{/if}}{{#if isMicroservice}}| `@nestjs/microservices` | `{{stack.nestMicroservices}}` | gRPC transport |
 | `@grpc/grpc-js` | `{{stack.grpcJs}}` | gRPC implementation |
 | `@grpc/proto-loader` | `{{stack.grpcProtoLoader}}` | Proto file loader |

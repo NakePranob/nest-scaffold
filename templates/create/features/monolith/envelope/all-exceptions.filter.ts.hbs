@@ -5,6 +5,7 @@ import {
   HttpException,
 } from '@nestjs/common';
 import { FastifyReply } from 'fastify';
+import { Logger } from 'nestjs-pino';
 import {
   COMMON_ERRORS,
   getHttpErrorDescriptor,
@@ -26,12 +27,14 @@ function serializeError(exception: unknown) {
 
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
+  constructor(private readonly logger: Logger) {}
+
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<FastifyReply>();
     const isProduction = process.env.NODE_ENV === 'production';
 
-    let status = COMMON_ERRORS.INTERNAL_ERROR.statusCode;
+    let status: number = COMMON_ERRORS.INTERNAL_ERROR.statusCode;
     const body: Record<string, unknown> = {
       code: COMMON_ERRORS.INTERNAL_ERROR.code,
       message: COMMON_ERRORS.INTERNAL_ERROR.message,
@@ -52,6 +55,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
         body.message = r.message ?? descriptor.message;
         if (r.errors) body.errors = r.errors;
       }
+    }
+
+    if (status >= 500) {
+      this.logger.error(exception, 'AllExceptionsFilter');
     }
 
     response.status(status).send(body);

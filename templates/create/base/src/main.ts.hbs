@@ -4,6 +4,7 @@ import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
+import { Logger } from 'nestjs-pino';
 {{/if}}
 {{#if isMicroservice}}
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
@@ -29,6 +30,7 @@ async function bootstrap() {
     AppModule,
     new FastifyAdapter(),
   );
+  app.useLogger(app.get(Logger));
 {{/if}}
 {{#if isMicroservice}}
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
@@ -56,7 +58,7 @@ async function bootstrap() {
   );
 
   app.useGlobalInterceptors(new ResponseInterceptor());
-  app.useGlobalFilters(new AllExceptionsFilter());
+  app.useGlobalFilters(new AllExceptionsFilter(app.get(Logger)));
 {{else}}
   // Add ValidationPipe here if needed
 {{/if}}

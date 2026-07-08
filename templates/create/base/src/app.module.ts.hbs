@@ -4,6 +4,7 @@ import { ConfigModule{{#if hasTypeorm}}, ConfigService{{/if}} } from '@nestjs/co
 import { TypeOrmModule } from '@nestjs/typeorm';
 {{/if}}
 {{#if isMonolith}}
+import { LoggerModule } from 'nestjs-pino';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 {{/if}}
@@ -20,6 +21,17 @@ import { UsersModule } from '{{modulesImportPrefix}}/users/users.module';
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
+{{#if isMonolith}}
+    LoggerModule.forRoot({
+      pinoHttp: {
+        level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+        transport:
+          process.env.NODE_ENV === 'production'
+            ? undefined
+            : { target: 'pino-pretty', options: { colorize: true } },
+      },
+    }),
+{{/if}}
 {{#if hasTypeorm}}
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
