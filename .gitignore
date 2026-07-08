@@ -5,3 +5,4 @@ dist/
 stack-update-report.md
 .hermes/
 .pnpm-store/
+.claude/
