@@ -1,21 +1,21 @@
 {
   "nestMajor": 11,
   "packages": [
-    { "key": "nestCommon", "name": "@nestjs/common", "version": "11.1.26" },
-    { "key": "nestCore", "name": "@nestjs/core", "version": "11.1.26" },
+    { "key": "nestCommon", "name": "@nestjs/common", "version": "11.1.28" },
+    { "key": "nestCore", "name": "@nestjs/core", "version": "11.1.28" },
     { "key": "nestConfig", "name": "@nestjs/config", "version": "4.0.4" },
-    { "key": "nestPlatformFastify", "name": "@nestjs/platform-fastify", "version": "11.1.26" },
-    { "key": "nestSwagger", "name": "@nestjs/swagger", "version": "11.4.4" },
-    { "key": "nestTypeorm", "name": "@nestjs/typeorm", "version": "11.0.1" },
+    { "key": "nestPlatformFastify", "name": "@nestjs/platform-fastify", "version": "11.1.28" },
+    { "key": "nestSwagger", "name": "@nestjs/swagger", "version": "11.4.5" },
+    { "key": "nestTypeorm", "name": "@nestjs/typeorm", "version": "11.0.3" },
     { "key": "nestJwt", "name": "@nestjs/jwt", "version": "11.0.2" },
     { "key": "nestPassport", "name": "@nestjs/passport", "version": "11.0.5" },
     { "key": "nestCli", "name": "@nestjs/cli", "version": "11.0.23" },
     { "key": "nestSchematics", "name": "@nestjs/schematics", "version": "11.1.0" },
-    { "key": "nestTesting", "name": "@nestjs/testing", "version": "11.1.26" },
+    { "key": "nestTesting", "name": "@nestjs/testing", "version": "11.1.28" },
     { "key": "fastifyStatic", "name": "@fastify/static", "version": "9.1.3" },
-    { "key": "fastify", "name": "fastify", "version": "5.8.5" },
+    { "key": "fastify", "name": "fastify", "version": "5.10.0" },
     { "key": "typeorm", "name": "typeorm", "version": "1.0.0" },
-    { "key": "pg", "name": "pg", "version": "8.21.0" },
+    { "key": "pg", "name": "pg", "version": "8.22.0" },
     { "key": "passport", "name": "passport", "version": "0.7.0" },
     { "key": "passportJwt", "name": "passport-jwt", "version": "4.0.1" },
     { "key": "classTransformer", "name": "class-transformer", "version": "0.5.1" },
@@ -30,8 +30,8 @@
     { "key": "pinoHttp", "name": "pino-http", "version": "11.0.0" },
     { "key": "pinoPretty", "name": "pino-pretty", "version": "13.1.3" },
 
-    { "key": "nestMicroservices", "name": "@nestjs/microservices", "version": "11.1.26" },
-    { "key": "grpcJs", "name": "@grpc/grpc-js", "version": "1.13.3" },
-    { "key": "grpcProtoLoader", "name": "@grpc/proto-loader", "version": "0.7.13" }
+    { "key": "nestMicroservices", "name": "@nestjs/microservices", "version": "11.1.28" },
+    { "key": "grpcJs", "name": "@grpc/grpc-js", "version": "1.14.4" },
+    { "key": "grpcProtoLoader", "name": "@grpc/proto-loader", "version": "0.8.1" }
   ]
 }
