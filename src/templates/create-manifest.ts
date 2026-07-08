@@ -365,12 +365,5 @@ export function getCreateTemplateEntries(): TemplateEntry[] {
       output: 'docs/architect/architecture.md',
       when: (c) => c.docs,
     },
-
-    // Config file
-    {
-      template: 'create/base/nest-scaffold.config.json.hbs',
-      output: 'nest-scaffold.config.json',
-      when: always,
-    },
   ];
 }

@@ -30,6 +30,7 @@ export async function readConfig(
     typeorm: raw.typeorm ?? false,
     responseEnvelope: raw.responseEnvelope ?? false,
     pagination: raw.pagination ?? false,
+    // auth/usersModule/seeds/e2e aren't persisted (see writeConfig) — always false here.
     auth: raw.auth ?? false,
     usersModule: raw.usersModule ?? false,
     seeds: raw.seeds ?? false,
@@ -45,7 +46,10 @@ export async function writeConfig(
   projectRoot: string,
   config: ScaffoldConfig,
 ): Promise<void> {
-  await fs.writeJson(getConfigPath(projectRoot), config, { spaces: 2 });
+  // ponytail: auth/usersModule/docker/seeds/e2e are create-time-only choices —
+  // no generate/method code path reads them back, so they're not persisted.
+  const { auth: _auth, usersModule: _usersModule, docker: _docker, seeds: _seeds, e2e: _e2e, ...persisted } = config;
+  await fs.writeJson(getConfigPath(projectRoot), persisted, { spaces: 2 });
 }
 
 export function enforceDependencies(
