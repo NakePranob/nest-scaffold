@@ -2,10 +2,12 @@ import { join } from 'path';
 
 export const grpcPackages: string[] = [
   'grpc.health.v1',
-  '{{protoPackage}}',
+  // Add '{{protoPackage}}' back here once src/proto/{{projectName}}.proto
+  // declares at least one service — an empty package makes @nestjs/microservices
+  // throw InvalidGrpcPackageException at boot.
 ];
 
 export const grpcProtoPaths: string[] = [
   join(__dirname, '..', 'proto', 'health.proto'),
-  join(__dirname, '..', 'proto', '{{projectName}}.proto'),
+  // join(__dirname, '..', 'proto', '{{projectName}}.proto'),
 ];

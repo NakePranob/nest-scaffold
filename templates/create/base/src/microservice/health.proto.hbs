@@ -4,7 +4,6 @@ package grpc.health.v1;
 
 service Health {
   rpc Check (HealthCheckRequest) returns (HealthCheckResponse);
-  rpc Watch (HealthCheckRequest) returns (stream HealthCheckResponse);
 }
 
 message HealthCheckRequest {

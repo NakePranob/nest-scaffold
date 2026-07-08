@@ -1,6 +1,5 @@
-import { ArgumentsHost, Catch, RpcExceptionFilter } from "@nestjs/common";
+import { ArgumentsHost, Catch, Logger, RpcExceptionFilter } from "@nestjs/common";
 import { RpcException } from "@nestjs/microservices";
-import { status } from "@grpc/grpc-js";
 import { Observable, throwError } from "rxjs";
 import { RPC_ERRORS } from "../errors/rpc-error-catalog";
 
@@ -14,10 +13,16 @@ type RpcErrorPayload = {
 export class RpcExceptionsFilter
   implements RpcExceptionFilter<RpcException | Error | unknown>
 {
+  private readonly logger = new Logger(RpcExceptionsFilter.name);
+
   catch(exception: RpcException | Error | unknown, _host: ArgumentsHost): Observable<never> {
     if (exception instanceof RpcException) {
       return throwError(() => exception.getError());
     }
+
+    this.logger.error(
+      exception instanceof Error ? (exception.stack ?? exception.message) : String(exception),
+    );
 
     const payload: RpcErrorPayload = {
       code: RPC_ERRORS.INTERNAL_ERROR.code,

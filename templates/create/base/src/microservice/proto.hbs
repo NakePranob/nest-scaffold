@@ -2,5 +2,7 @@ syntax = "proto3";
 
 package {{protoPackage}};
 
-// Add your project-level RPCs here
+// Add your project-level RPCs here, then uncomment the matching entries in
+// src/grpc/grpc.options.ts (see the comment there — an empty package here
+// crashes the server at boot).
 // For module-specific protos, see src/modules/*/infrastructure/proto/

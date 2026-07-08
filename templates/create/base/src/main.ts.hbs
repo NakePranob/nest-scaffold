@@ -41,6 +41,10 @@ async function bootstrap() {
         package: grpcPackages,
         protoPath: grpcProtoPaths,
         url: process.env.GRPC_URL ?? '0.0.0.0:50051',
+        loader: {
+          longs: String,
+          defaults: true,
+        },
       },
     },
   );
@@ -79,4 +83,7 @@ async function bootstrap() {
   await app.listen();
 {{/if}}
 }
-void bootstrap();
+bootstrap().catch((error: unknown) => {
+  console.error('Failed to start application', error);
+  process.exit(1);
+});
