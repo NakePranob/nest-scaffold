@@ -73,7 +73,6 @@ try {
       'export function ApiApproveDocs() {',
       '  return applyDecorators(',
       "    ApiOperation({ summary: 'Update user' }),",
-      '    ApiBearerAuth(),',
       "    ApiParam({ name: 'id' }),",
       '    ApiBody({ type: UpdateUserDto }),',
       '    ApiSuccessResponse(UserResponseDto),',
@@ -109,6 +108,12 @@ try {
   run(`node "${cliBin}" generate method audit-log publish --type patch`, autoDir);
   const generatedController = read(path.join(autoDir, 'src/modules/audit-log/audit-log.controller.ts'));
   assertIncludes(generatedController, 'publish(@Param(\'id\') id: string, @Body() dto: UpdateAuditLogDto)', 'missing controller auto-generated before method patch');
+  // auth is on in --defaults projects, but generate must never auto-wire the guard onto new modules
+  assertNotIncludes(generatedController, '@UseGuards(', 'generated controller has no auto-injected auth guard');
+  assertNotIncludes(generatedController, 'JwtAuthGuard', 'generated controller does not import auth guard');
+  const generatedSwagger = read(path.join(autoDir, 'src/modules/audit-log/swagger/audit-log-swagger.decorator.ts'));
+  assertNotIncludes(generatedSwagger, 'ApiBearerAuth(', 'generated swagger has no auto-injected bearer decorator');
+  assertNotIncludes(generatedSwagger, 'ApiProtectedErrors(', 'generated swagger has no auto-injected protected-errors decorator');
 
   run(`node "${cliBin}" generate controller audit-entry`, autoDir);
   run(`node "${cliBin}" generate method audit-entry archive --type delete`, autoDir);

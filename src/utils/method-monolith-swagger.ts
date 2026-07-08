@@ -220,7 +220,7 @@ export async function ensureMonolithSwaggerSupport(
       decoratorFilePath,
       [
         "import { applyDecorators } from '@nestjs/common';",
-        "import { ApiBearerAuth, ApiOperation } from '@nestjs/swagger';",
+        "import { ApiOperation } from '@nestjs/swagger';",
         '',
       ].join('\n'),
     );
@@ -281,7 +281,6 @@ export function buildMonolithSwaggerHelperName(methodName: string): string {
 }
 
 export function buildMonolithSwaggerHelperStatements(
-  config: ScaffoldConfig,
   method: MethodContextLike,
   naming: ModuleNaming,
   artifacts: ModuleArtifacts,
@@ -291,10 +290,6 @@ export function buildMonolithSwaggerHelperStatements(
   const helperCalls: string[] = [
     `ApiOperation({ summary: '${buildMonolithSwaggerSummary(method, naming, artifacts)}' })`,
   ];
-
-  if (config.auth && method.methodType !== 'post') {
-    helperCalls.push('ApiBearerAuth()');
-  }
 
   if (method.methodType === 'get' && method.getMode !== 'all') {
     helperCalls.push(`ApiParam({ name: '${method.lookupField ?? 'id'}' })`);
@@ -316,7 +311,6 @@ export function buildMonolithSwaggerHelperStatements(
     helperCalls.push(
       `${useSearchDto ? 'ApiPaginatedSuccessResponse' : 'ApiArraySuccessResponse'}(${swaggerSupport.responseDtoName})`,
     );
-    if (config.auth) helperCalls.push('ApiProtectedErrors()');
     helperCalls.push('ApiDefaultErrors()');
   } else if (method.methodType === 'post') {
     helperCalls.push(`ApiSuccessResponse(${swaggerSupport.responseDtoName})`);
@@ -337,7 +331,6 @@ export function buildMonolithSwaggerHelperStatements(
     } else {
       helperCalls.push(`ApiNotFoundError('${swaggerSupport.errorCodePrefix}_NOT_FOUND', '${artifacts.entityName} not found')`);
     }
-    if (config.auth) helperCalls.push('ApiProtectedErrors()');
     helperCalls.push('ApiDefaultErrors()');
   } else {
     helperCalls.push(`ApiSuccessResponse(${swaggerSupport.responseDtoName})`);
@@ -348,7 +341,6 @@ export function buildMonolithSwaggerHelperStatements(
     } else {
       helperCalls.push(`ApiNotFoundError('${swaggerSupport.errorCodePrefix}_NOT_FOUND', '${artifacts.entityName} not found')`);
     }
-    if (config.auth) helperCalls.push('ApiProtectedErrors()');
     helperCalls.push('ApiDefaultErrors()');
   }
 

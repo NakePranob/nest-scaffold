@@ -28,10 +28,6 @@ import {
   relativeImport,
 } from './source-file-utils';
 
-function shouldProtectMonolithMethod(method: MethodContext): boolean {
-  return method.methodType !== 'post';
-}
-
 async function ensureDirectory(filePath: string): Promise<void> {
   await fs.ensureDir(path.dirname(filePath));
 }
@@ -91,10 +87,6 @@ function buildMonolithControllerMethod(
   statements: string[];
 } {
   const decorators: Array<{ name: string; args: string[] }> = [];
-
-  if (config.auth && shouldProtectMonolithMethod(method)) {
-    decorators.push({ name: 'UseGuards', args: ['JwtAuthGuard'] });
-  }
 
   if (config.swagger && swaggerHelperName) {
     decorators.push({ name: swaggerHelperName, args: [] });
@@ -202,11 +194,8 @@ function buildMonolithServiceStatements(method: MethodContext): string[] {
 }
 
 function ensureMonolithCommonImports(
-  controllerFilePath: string,
   controllerFile: ReturnType<typeof ensureSourceFile>,
-  config: ScaffoldConfig,
   method: MethodContext,
-  moduleVersion: string,
   useSearchDto: boolean,
 ): void {
   const commonImports: string[] = [];
@@ -217,18 +206,8 @@ function ensureMonolithCommonImports(
   if (method.methodType === 'delete') commonImports.push('Delete', 'Param');
   if (method.methodType === 'get' && method.getMode === 'one') commonImports.push('Param');
   if (useSearchDto) commonImports.push('Query');
-  if (config.auth && shouldProtectMonolithMethod(method)) commonImports.push('UseGuards');
 
   ensureNamedImport(controllerFile, '@nestjs/common', [...new Set(commonImports)]);
-
-  if (config.auth && shouldProtectMonolithMethod(method)) {
-    const pathContext = resolveModulePathContext(config.moduleVersioning, moduleVersion);
-    ensureNamedImport(
-      controllerFile,
-      `${pathContext.commonFromModule}/guards/jwt-auth.guard`,
-      ['JwtAuthGuard'],
-    );
-  }
 }
 
 function ensureSwaggerHelper(
@@ -248,7 +227,7 @@ function ensureSwaggerHelper(
   const decoratorImportPaths = getMonolithSwaggerDecoratorImportPaths(config, moduleVersion);
 
   ensureNamedImport(swaggerFile, '@nestjs/common', ['applyDecorators']);
-  ensureNamedImport(swaggerFile, '@nestjs/swagger', ['ApiBearerAuth', 'ApiBody', 'ApiOperation', 'ApiParam']);
+  ensureNamedImport(swaggerFile, '@nestjs/swagger', ['ApiBody', 'ApiOperation', 'ApiParam']);
   ensureNamedImport(
     swaggerFile,
     decoratorImportPaths.successPath,
@@ -257,7 +236,7 @@ function ensureSwaggerHelper(
   ensureNamedImport(
     swaggerFile,
     decoratorImportPaths.errorPath,
-    ['ApiConflictError', 'ApiDefaultErrors', 'ApiNotFoundError', 'ApiProtectedErrors'],
+    ['ApiConflictError', 'ApiDefaultErrors', 'ApiNotFoundError'],
   );
   ensureNamedImport(
     swaggerFile,
@@ -292,7 +271,6 @@ function ensureSwaggerHelper(
       isExported: true,
       name: swaggerHelperName,
       statements: buildMonolithSwaggerHelperStatements(
-        config,
         method,
         naming,
         artifacts,
@@ -340,7 +318,7 @@ export async function patchMonolith(
     touchedFiles.add(swaggerSupport.decoratorFilePath);
   }
 
-  ensureMonolithCommonImports(paths.controllerPath, controllerFile, config, method, moduleVersion, useSearchDto);
+  ensureMonolithCommonImports(controllerFile, method, useSearchDto);
 
   let swaggerHelperName: string | undefined;
   if (config.swagger && swaggerSupport) {

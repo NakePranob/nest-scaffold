@@ -7,9 +7,6 @@ import {
   Patch,
   Delete,
   Query,
-{{#if hasAuth}}
-  UseGuards,
-{{/if}}
 } from '@nestjs/common';
 {{#if hasSwagger}}
 import { ApiTags } from '@nestjs/swagger';
@@ -19,9 +16,6 @@ import { Create{{entityName}}Dto } from './dto/create-{{entityFile}}.dto';
 import { Update{{entityName}}Dto } from './dto/update-{{entityFile}}.dto';
 {{#if hasPagination}}
 import { Search{{entityName}}Dto } from './dto/search-{{entityFile}}.dto';
-{{/if}}
-{{#if hasAuth}}
-import { JwtAuthGuard } from '{{commonFromModule}}/guards/jwt-auth.guard';
 {{/if}}
 {{#if hasSwagger}}
 import {
@@ -49,9 +43,6 @@ export class {{pascalName}}Controller {
   }
 
   @Get()
-{{#if hasAuth}}
-  @UseGuards(JwtAuthGuard)
-{{/if}}
 {{#if hasSwagger}}
   @ApiFind{{pascalName}}Docs()
 {{/if}}
@@ -60,9 +51,6 @@ export class {{pascalName}}Controller {
   }
 
   @Get(':id')
-{{#if hasAuth}}
-  @UseGuards(JwtAuthGuard)
-{{/if}}
 {{#if hasSwagger}}
   @ApiFind{{entityName}}ByIdDocs()
 {{/if}}
@@ -71,9 +59,6 @@ export class {{pascalName}}Controller {
   }
 
   @Patch(':id')
-{{#if hasAuth}}
-  @UseGuards(JwtAuthGuard)
-{{/if}}
 {{#if hasSwagger}}
   @ApiUpdate{{entityName}}Docs()
 {{/if}}
@@ -82,9 +67,6 @@ export class {{pascalName}}Controller {
   }
 
   @Delete(':id')
-{{#if hasAuth}}
-  @UseGuards(JwtAuthGuard)
-{{/if}}
 {{#if hasSwagger}}
   @ApiDelete{{entityName}}Docs()
 {{/if}}
