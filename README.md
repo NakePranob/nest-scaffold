@@ -166,8 +166,10 @@ What it does under the hood:
   piece first, then adds the method on top.
 - Reuses existing DTO/request files when present; creates minimal stubs when
   they don't exist yet.
-- Adds Swagger decorators and auth guards to the new endpoint automatically —
-  but only if those features already exist in the project.
+- Adds Swagger decorators to the new endpoint automatically, if Swagger exists
+  in the project. Auth is left to you — copy the `@UseGuards(JwtAuthGuard)`
+  pattern from the generated `users` module onto the endpoints you want to
+  protect, so route-level auth stays an explicit decision.
 - Derives gRPC RPC names and request DTO names from your method name, so a
   custom name like `approve` stays consistent across the controller, the
   service, and the `.proto` file.

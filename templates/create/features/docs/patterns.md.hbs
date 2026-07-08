@@ -88,10 +88,12 @@ test/
 - One `@GrpcMethod()` per proto RPC, delegates immediately to application service
 - No business logic, no error handling — errors bubble up through `RpcExceptionsFilter`
 {{else}}
-- Owns routes, validation, auth guards, and response metadata
+- Owns routes, validation, and response metadata
 - Should not contain business logic directly
 - Delegates work to the service layer
-{{/if}}
+{{#if hasAuth}}- Auth is opt-in per endpoint — `generate` never adds `@UseGuards(JwtAuthGuard)`
+  automatically; add it yourself where needed (see `src/modules/users` for the pattern)
+{{/if}}{{/if}}
 
 ### Service
 {{#if isMicroservice}}

@@ -59,7 +59,14 @@ Patches the existing controller + service{{#if isMicroservice}} + `.proto`{{/if}
 in place. Leaves the method body as a TODO-style stub — it scaffolds shape,
 not your domain logic. Never overwrites a method with the same name in
 place; if the name collides it asks for a different one instead.
+{{#if hasAuth}}
+### Auth on generated endpoints
 
+This project has JWT auth, but `generate` never wires it — a new endpoint is
+**public** until you guard it. To require auth on one, add
+`@UseGuards(JwtAuthGuard)` to the controller method yourself, copying the
+import and decorator from `src/modules/users/users.controller.ts`.
+{{/if}}
 ## Config
 
 This project's `nest-scaffold.config.json` records architecture

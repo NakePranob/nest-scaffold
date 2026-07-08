@@ -53,3 +53,8 @@ Quick shape, always run from the project root:
 npx nest-scaffold generate module <name> --full
 npx nest-scaffold generate method <module> <methodName> --type <get|post|put|patch|delete>
 ```
+{{#if hasAuth}}
+This project has JWT auth, but `generate` leaves new endpoints **public** — add
+`@UseGuards(JwtAuthGuard)` yourself to protect them (see the auth note in
+`.agents/skills/nest-scaffold.md`).
+{{/if}}
