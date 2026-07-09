@@ -10,6 +10,7 @@ import {
   generateControllerCommand,
 } from './commands/generate';
 import { generateMethodCommand } from './commands/method';
+import { upgradeCommand } from './commands/upgrade';
 
 function wrapCommand<T extends (...args: any[]) => Promise<void>>(fn: T): T {
   return (async (...args: any[]) => {
@@ -155,5 +156,10 @@ generate
       await generateMethodCommand(moduleName, methodName, options);
     },
   ));
+
+program
+  .command('upgrade')
+  .description('Upgrade an existing project\'s dependencies to the versions pinned by this CLI')
+  .action(wrapCommand(upgradeCommand));
 
 program.parse();
