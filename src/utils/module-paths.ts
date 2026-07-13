@@ -45,6 +45,17 @@ export function moduleFeaturePath(
   return segments.join('/');
 }
 
+export function errorCatalogImportPathFromCommon(
+  moduleVersioning: boolean,
+  moduleVersion: string,
+  feature: string,
+  fileBase: string,
+): string {
+  const version = moduleVersioning ? moduleVersion : '';
+  const modulesPrefix = version ? `modules/${version}` : 'modules';
+  return `../../${modulesPrefix}/${feature}/${fileBase}-error-catalog`;
+}
+
 export function moduleImportPath(
   moduleVersioning: boolean,
   moduleVersion: string,

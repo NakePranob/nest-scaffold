@@ -1,4 +1,10 @@
 import { HttpStatus } from '@nestjs/common';
+{{#if hasAuth}}
+import { AuthErrorCode } from '../../{{modulesPrefix}}/auth/auth-error-catalog';
+{{/if}}
+{{#if hasUsersModule}}
+import { UserErrorCode } from '../../{{modulesPrefix}}/users/user-error-catalog';
+{{/if}}
 
 export enum CommonErrorCode {
   InternalError = 'INTERNAL_ERROR',
@@ -59,6 +65,22 @@ export const COMMON_ERRORS = {
     statusCode: HttpStatus.CONFLICT,
   },
 } as const satisfies Record<string, ErrorDescriptor>;
+
+// Closed set of every error code any endpoint can return, used to type
+// ErrorResponseDto.code as an OpenAPI enum instead of a plain string.
+// `nest-scaffold generate module --full` registers each new module's error
+// catalog here automatically — see src/common/swagger/dto/error-response.dto.ts.
+export const ALL_ERROR_CODES = [
+  ...Object.values(CommonErrorCode),
+{{#if hasAuth}}
+  ...Object.values(AuthErrorCode),
+{{/if}}
+{{#if hasUsersModule}}
+  ...Object.values(UserErrorCode),
+{{/if}}
+] as const;
+
+export type AppErrorCode = (typeof ALL_ERROR_CODES)[number];
 
 export function getHttpErrorDescriptor(statusCode: number): ErrorDescriptor {
   switch (statusCode) {

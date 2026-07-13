@@ -1,8 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ALL_ERROR_CODES } from '../../errors/app-error-catalog';
+import type { AppErrorCode } from '../../errors/app-error-catalog';
 
 export class ErrorResponseDto {
-  @ApiProperty({ example: 'USER_NOT_FOUND' })
-  code: string;
+  @ApiProperty({ enum: ALL_ERROR_CODES, example: 'USER_NOT_FOUND' })
+  code: AppErrorCode;
 
   @ApiProperty({ example: 'User not found' })
   message: string;

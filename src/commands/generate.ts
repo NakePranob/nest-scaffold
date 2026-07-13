@@ -11,6 +11,7 @@ import {
 } from '../utils/template-renderer';
 import { registerModuleInAppModule } from '../utils/app-module-patcher';
 import { registerModuleGrpcProto } from '../utils/grpc-options-patcher';
+import { registerErrorCodeInAppCatalog } from '../utils/error-catalog-patcher';
 import { getGenerateModuleEntries } from '../templates/generate-manifest';
 import {
   promptModuleVersion,
@@ -19,6 +20,7 @@ import {
 import {
   moduleFeaturePath,
   moduleImportPath,
+  errorCatalogImportPathFromCommon,
 } from '../utils/module-paths';
 
 export async function generateServiceCommand(
@@ -253,6 +255,20 @@ export async function generateModuleCommand(
 
   if (config.architecture === 'microservice' && isFull) {
     await registerModuleGrpcProto(projectRoot, config, moduleVersion ?? '', naming, { infraLayer: true });
+  }
+
+  if (isFull && config.responseEnvelope && config.architecture !== 'microservice') {
+    const errorCatalogImportPath = errorCatalogImportPathFromCommon(
+      config.moduleVersioning,
+      moduleVersion,
+      naming.name,
+      naming.fileBase,
+    );
+    await registerErrorCodeInAppCatalog(
+      projectRoot,
+      `${naming.pascalName}ErrorCode`,
+      errorCatalogImportPath,
+    );
   }
 
   console.log(
