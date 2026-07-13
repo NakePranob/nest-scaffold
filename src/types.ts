@@ -10,6 +10,7 @@ export interface ScaffoldConfig {
   defaultModuleVersion: string;
   moduleVersions: string[];
   swagger: boolean;
+  apiPrefix: boolean;
   docker: boolean;
   typeorm: boolean;
   responseEnvelope: boolean;

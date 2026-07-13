@@ -30,6 +30,12 @@ const STEPS: WizardStep[] = [
     when: (_, arch) => arch === 'monolith',
   },
   {
+    key: 'apiPrefix',
+    message: "Prefix all routes with 'api' (e.g. /api/users)?",
+    default: false,
+    when: (_, arch) => arch === 'monolith',
+  },
+  {
     key: 'usersModule',
     message: 'Include example Users module (CRUD)?',
     default: true,
@@ -103,6 +109,7 @@ export async function runCreateWizard(
     defaultModuleVersion: answers.moduleVersioning ? 'v1' : '',
     moduleVersions: answers.moduleVersioning ? ['v1'] : [],
     swagger: answers.swagger,
+    apiPrefix: answers.apiPrefix ?? false,
     docker: answers.docker,
     typeorm: true,
     responseEnvelope: true,
@@ -123,6 +130,7 @@ export async function runCreateWizard(
   console.log(`  Architecture: ${archLabel}`);
   if (config.architecture === 'monolith') {
     console.log(`  Swagger: ${config.swagger ? 'yes' : 'no'}`);
+    console.log(`  API prefix: ${config.apiPrefix ? 'yes' : 'no'}`);
     console.log(`  Users module: ${config.usersModule ? 'yes' : 'no'}`);
     console.log(`  Auth: ${config.auth ? 'yes' : 'no'}`);
     console.log(`  Seeds: ${config.seeds ? 'yes' : 'no'}`);

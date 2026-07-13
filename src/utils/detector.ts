@@ -91,6 +91,7 @@ export async function detectConfig(
     defaultModuleVersion: versioning.defaultModuleVersion,
     moduleVersions,
     swagger: hasSwagger,
+    apiPrefix: false, // ponytail: not detected from main.ts, add a setGlobalPrefix scan if this matters
     docker: hasDocker,
     typeorm: hasTypeorm,
     responseEnvelope: hasEnvelope,

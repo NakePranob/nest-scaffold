@@ -26,6 +26,7 @@ export async function readConfig(
     defaultModuleVersion: raw.defaultModuleVersion ?? '',
     moduleVersions: raw.moduleVersions ?? [],
     swagger: raw.swagger ?? false,
+    apiPrefix: raw.apiPrefix ?? false,
     docker: raw.docker ?? false,
     typeorm: raw.typeorm ?? false,
     responseEnvelope: raw.responseEnvelope ?? false,
@@ -65,6 +66,7 @@ export function enforceDependencies(
 
   if (next.architecture === 'microservice') {
     next.swagger = false;
+    next.apiPrefix = false;
     next.usersModule = false;
     next.auth = false;
     next.seeds = false;

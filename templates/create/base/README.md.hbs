@@ -11,7 +11,8 @@ cp .env.example .env
 pnpm run start:dev
 ```
 
-{{#if swagger}}Swagger: http://localhost:3000/api{{/if}}
+{{#if swagger}}Swagger: http://localhost:3000/docs{{/if}}
+{{#if apiPrefix}}API routes prefixed with: `/api`{{/if}}
 
 ## Scripts
 

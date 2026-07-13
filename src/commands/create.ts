@@ -113,7 +113,10 @@ export async function createCommand(
   } else {
     console.log('  pnpm run start:dev');
     if (config.swagger) {
-      console.log('\n  Swagger: http://localhost:3000/api');
+      console.log('\n  Swagger: http://localhost:3000/docs');
+    }
+    if (config.apiPrefix) {
+      console.log('  API routes prefixed with: /api');
     }
   }
   console.log('');
@@ -131,6 +134,7 @@ function getDefaultConfig(
     defaultModuleVersion: '',
     moduleVersions: [],
     swagger: architecture === 'monolith',
+    apiPrefix: false,
     docker: true,
     typeorm: true,
     responseEnvelope: architecture === 'monolith',

@@ -31,6 +31,9 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
   app.useLogger(app.get(Logger));
+{{#if apiPrefix}}
+  app.setGlobalPrefix('api');
+{{/if}}
 {{/if}}
 {{#if isMicroservice}}
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(
