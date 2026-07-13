@@ -14,6 +14,13 @@ import {
   ValidationErrorResponseDto,
 } from '../dto/error-response.dto';
 
+// The `properties` overrides below are raw inline JSON-schema objects, not
+// `@ApiProperty()` on a real class — there's no TS type for the swagger CLI
+// plugin to infer from, so every property here needs an explicit `type` or
+// codegen tools (e.g. orval) emit `unknown` for it. A bare `$ref` doesn't
+// need this (see api-success-response.decorator.ts) since it already
+// points at a named schema with its own type.
+
 export function ApiValidationError() {
   return applyDecorators(
     ApiExtraModels(ValidationErrorResponseDto),
@@ -34,9 +41,8 @@ export function ApiUnauthorizedError() {
           { $ref: getSchemaPath(ErrorResponseDto) },
           {
             properties: {
-              code: { example: 'UNAUTHORIZED' },
-              message: { example: 'Unauthorized' },
-              errors: { example: null },
+              code: { type: 'string', example: 'UNAUTHORIZED' },
+              message: { type: 'string', example: 'Unauthorized' },
             },
           },
         ],
@@ -55,9 +61,8 @@ export function ApiForbiddenError() {
           { $ref: getSchemaPath(ErrorResponseDto) },
           {
             properties: {
-              code: { example: 'FORBIDDEN' },
-              message: { example: 'Forbidden' },
-              errors: { example: null },
+              code: { type: 'string', example: 'FORBIDDEN' },
+              message: { type: 'string', example: 'Forbidden' },
             },
           },
         ],
@@ -79,9 +84,8 @@ export function ApiNotFoundError(
           { $ref: getSchemaPath(ErrorResponseDto) },
           {
             properties: {
-              code: { example: code },
-              message: { example: message },
-              errors: { example: null },
+              code: { type: 'string', example: code },
+              message: { type: 'string', example: message },
             },
           },
         ],
@@ -100,9 +104,8 @@ export function ApiConflictError(code = 'CONFLICT', message = 'Conflict') {
           { $ref: getSchemaPath(ErrorResponseDto) },
           {
             properties: {
-              code: { example: code },
-              message: { example: message },
-              errors: { example: null },
+              code: { type: 'string', example: code },
+              message: { type: 'string', example: message },
             },
           },
         ],
@@ -121,9 +124,8 @@ export function ApiInternalServerError() {
           { $ref: getSchemaPath(ErrorResponseDto) },
           {
             properties: {
-              code: { example: 'INTERNAL_ERROR' },
-              message: { example: 'Internal server error' },
-              errors: { example: null },
+              code: { type: 'string', example: 'INTERNAL_ERROR' },
+              message: { type: 'string', example: 'Internal server error' },
             },
           },
         ],
