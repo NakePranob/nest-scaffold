@@ -16,7 +16,7 @@ importers:
         version: 15.0.0
       fs-extra:
         specifier: ^11.3.0
-        version: 11.3.6
+        version: 11.4.0
       handlebars:
         specifier: ^4.7.8
         version: 4.7.9
@@ -237,8 +237,8 @@ packages:
       picomatch:
         optional: true
 
-  fs-extra@11.3.6:
-    resolution: {integrity: sha512-w8ZNZr2mKIc7qeNaQ9AVPT1+iFaI+Avd4xudVOvdDJ8VytREi1Ft5Ih7hd9jjehod8vAM5GMsfQ/TpPf4EyoEA==}
+  fs-extra@11.4.0:
+    resolution: {integrity: sha512-EQsFzMUJkCKGr1ePqlYADkIUmHW1s3ZXr5Yqy6wbGrfUCphpl2maM/kyOIRA2HpP3AaFQTZXD4ldjek+nccddA==}
     engines: {node: '>=14.14'}
 
   graceful-fs@4.2.11:
@@ -521,7 +521,7 @@ snapshots:
     optionalDependencies:
       picomatch: 4.0.5
 
-  fs-extra@11.3.6:
+  fs-extra@11.4.0:
     dependencies:
       graceful-fs: 4.2.11
       jsonfile: 6.2.1
