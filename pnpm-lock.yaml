@@ -25,7 +25,7 @@ importers:
         version: 1.1.1
       prettier:
         specifier: ^3.8.4
-        version: 3.8.4
+        version: 3.9.9
       ts-morph:
         specifier: ^28.0.0
         version: 28.0.0
@@ -284,8 +284,8 @@ packages:
     resolution: {integrity: sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==}
     engines: {node: '>=12'}
 
-  prettier@3.8.4:
-    resolution: {integrity: sha512-N2MylSdi48+5N/6S5j+maeHbUSIzzZ5uOcX5Hm4QpV8Dkb1HFjfAKTKX6yNPJQD9AhcT3ifHNB66tWTTJDi11Q==}
+  prettier@3.9.9:
+    resolution: {integrity: sha512-Z/CJHIkdujO/OtN7nXUii0Rf3VT5SRuhjBA82Xvu2XhBUgX3nhP67T0LHceBdQLex7OOFGTox+Q5Yg8Jk2Qivg==}
     engines: {node: '>=14'}
     hasBin: true
 
@@ -566,7 +566,7 @@ snapshots:
 
   picomatch@4.0.5: {}
 
-  prettier@3.8.4: {}
+  prettier@3.9.9: {}
 
   safer-buffer@2.1.2: {}
 
